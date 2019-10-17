@@ -35,12 +35,25 @@
             <version>3.2.5</version>
         </dependency>
 
-        <!-- 引入lombok可以省略set get方法 -->
+        <!-- 引入lombok，使用@Data可以省略set get方法 @Slf4j直接使用log打印日志 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.20</version>
         </dependency>
+        <!-- 日志打印 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.26</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
