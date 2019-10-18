@@ -7,5 +7,5 @@ package cn.xian.webapp.service;
 
 public interface DemoService {
 
-    String getInfo(String name,Integer age);
+    String getInfo(String name);
 }

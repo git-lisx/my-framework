@@ -7,21 +7,23 @@ import cn.xian.webapp.service.DemoService;
 
 /**
  * @author lishixian
- * @date 2019/10/16 下午5:49
+ * @date 2019/10/16 下午8:49
  */
 @MyController
+@MyRequestMapping("/demo")
 public class DemoController {
 
     /**
-     * todo 暂只支持通过byName注入
+     * 暂先支持通过byName注入
      */
     @MyAutowired
     private DemoService demoServiceImpl;
 
-    @MyRequestMapping("/demo-test")
+    @MyRequestMapping("/test")
     public String demoTest(String name) {
-        String result = demoServiceImpl.getInfo(name, 18);
+        String result = demoServiceImpl.getInfo(name);
         return "返回值为：" + result;
     }
+
 
 }

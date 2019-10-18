@@ -8,11 +8,13 @@ import cn.xian.springframework.stereotype.MyComponent;
 import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.stereotype.MyRepository;
 import cn.xian.springframework.stereotype.MyService;
+import lombok.Data;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * bean工厂
@@ -20,10 +22,15 @@ import java.util.List;
  * @author lishixian
  * @date 2019/10/15 下午7:45
  */
+@Data
 public class BeanFactory {
 
     private static BeanFactory beanFactory;
-    private List<BeanDefinition> beanDefinitionList = new ArrayList<>();
+    private List<BeanDefinition> beanDefinitions;
+
+    public BeanFactory() {
+        beanDefinitions = new ArrayList<>();
+    }
 
     /**
      * 获取bean工厂
@@ -45,7 +52,7 @@ public class BeanFactory {
      * 注入依赖
      */
     public static void injectDependency() {
-        List<BeanDefinition> beanDefinitionList = BeanFactory.instance().getBeanDefinitionList();
+        List<BeanDefinition> beanDefinitionList = BeanFactory.instance().getBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitionList) {
             Object bean = beanDefinition.getBean();
             Field[] fields = bean.getClass().getDeclaredFields();
@@ -57,7 +64,7 @@ public class BeanFactory {
                         BeanDefinition fieldBeanDefinition = BeanFactory.instance().getBeanDefinition(name);
                         field.setAccessible(true);
                         try {
-                            field.set(bean,fieldBeanDefinition.getBean());
+                            field.set(bean, fieldBeanDefinition.getBean());
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
@@ -100,26 +107,20 @@ public class BeanFactory {
         BeanDefinition beanDefinition = BeanDefinition.invoke(clazz);
         if (beanDefinition != null) {
             beanDefinition.setBeanType(beanType);
-            beanDefinitionList.add(beanDefinition);
+            beanDefinitions.add(beanDefinition);
         }
     }
 
-    /**
-     * 将beanDefinition添加到工厂里
-     *
-     * @param beanDefinition bean定义
-     */
-    public void addBeanDefinitionToFactory(BeanDefinition beanDefinition) {
-        beanDefinitionList.add(beanDefinition);
-    }
 
     /**
-     * 获取工厂里的所有bean定义
+     * 获取工厂里的所有controller的bean定义
      *
-     * @return 工厂里的所有bean定义
+     * @return 工厂里的所有controller的bean定义
      */
-    public List<BeanDefinition> getBeanDefinitionList() {
-        return beanDefinitionList;
+    public List<BeanDefinition> getControllers() {
+        return beanDefinitions.stream()
+                .filter(beanDefinition -> BeanTypeEnum.CONTROLLER.equals(beanDefinition.getBeanType()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -129,7 +130,7 @@ public class BeanFactory {
      * @return BeanDefinition
      */
     public BeanDefinition getBeanDefinition(String nameOrClassName) {
-        for (BeanDefinition beanDefinition : beanDefinitionList) {
+        for (BeanDefinition beanDefinition : beanDefinitions) {
             BeanDefinition beanDefinition1 = beanDefinition.getBeanDefinition(nameOrClassName);
             if (beanDefinition1 != null) {
                 return beanDefinition1;

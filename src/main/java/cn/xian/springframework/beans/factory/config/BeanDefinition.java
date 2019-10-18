@@ -1,8 +1,10 @@
 package cn.xian.springframework.beans.factory.config;
 
+import cn.xian.springframework.beans.factory.utils.ClassUtil;
 import lombok.Data;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 /**
@@ -25,18 +27,23 @@ public class BeanDefinition<T> {
     // aop对象
     private Object aop;
     // 对象
-    private T bean;
-    private List<MethodDefinition> methods;
+    private Object bean;
+    private List<MethodDefinition> methodDefinitions;
+
+    public BeanDefinition() {
+        methodDefinitions = new ArrayList<>();
+    }
 
     /**
      * 将class解析成beanDefinition
+     *
      * @param clazz 字节码
      * @return BeanDefinition
      */
-    public static BeanDefinition invoke(Class clazz){
+    public static BeanDefinition invoke(Class clazz) {
         BeanDefinition beanDefinition = new BeanDefinition();
 
-        char[]chars = clazz.getSimpleName().toCharArray();
+        char[] chars = clazz.getSimpleName().toCharArray();
         chars[0] += 32;
         beanDefinition.setName(String.valueOf(chars));
         beanDefinition.setClassName(clazz.getName());
@@ -47,17 +54,20 @@ public class BeanDefinition<T> {
             e.printStackTrace();
             return null;
         }
-        invokeMethodDefinition(clazz);
+        beanDefinition.setMethodDefinitions(invokeMethodDefinition(clazz));
         return beanDefinition;
     }
 
     /**
-     * 将class中的方法解析成MethodDefinition，并添加到methods
+     * 将class中的方法解析成MethodDefinition
+     *
      * @param clazz 字节码
+     * @return 返回所有MethodDefinition
      */
-    private static void invokeMethodDefinition(Class clazz){
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
+    private static List<MethodDefinition> invokeMethodDefinition(Class clazz) {
+        List<MethodDefinition> methodDefinitions = new ArrayList<>();
+        Method[] clazzMethods = clazz.getDeclaredMethods();
+        for (Method method : clazzMethods) {
             MethodDefinition methodDefinition = new MethodDefinition();
             methodDefinition.setMethod(method);
             methodDefinition.setMethodName(method.getName());
@@ -65,10 +75,13 @@ public class BeanDefinition<T> {
             Class[] paramsType = method.getParameterTypes();
             methodDefinition.setParamTypes(Arrays.asList(paramsType));
             //获取method的所有参数名称
-//            String[] paramsName = method.
-        }
-    }
+            List<String> paramNames = ClassUtil.getParamNames(method, clazz);
 
+            methodDefinition.setParamNames(paramNames);
+            methodDefinitions.add(methodDefinition);
+        }
+        return methodDefinitions;
+    }
 
 
     /**
@@ -96,7 +109,7 @@ public class BeanDefinition<T> {
      * @return MethodDefinition
      */
     public MethodDefinition getMethodDefinition(String methodName) {
-        Optional<MethodDefinition> methodDefinitionOptional = methods.stream()
+        Optional<MethodDefinition> methodDefinitionOptional = methodDefinitions.stream()
                 .filter(methodDefinition -> methodDefinition.getMethodName().equals(methodName)).findFirst();
         return methodDefinitionOptional.orElse(null);
     }

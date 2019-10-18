@@ -1,0 +1,11 @@
+<web-app>
+    <servlet>
+        <servlet-name>mySpringFramework</servlet-name>
+        <servlet-class>cn.xian.springframework.web.servlet.MyDispatcherServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>mySpringFramework</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

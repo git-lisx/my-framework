@@ -1,8 +1,6 @@
 package cn.xian.springframework.beans.factory.classloader;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -36,7 +34,7 @@ public class ClassScanner {
             e.printStackTrace();
             return;
         }
-        System.out.println("类扫描的路径为:" + file);
+        log.debug("类扫描的路径为:" + file);
         //使用队列来实现广度遍历,找出.class文件
         Queue<File> queue = new LinkedList<>();
         scanDirectoryAndInvokeClass(file, queue);
@@ -44,7 +42,7 @@ public class ClassScanner {
             File pollFile = queue.poll();
             scanDirectoryAndInvokeClass(pollFile, queue);
         }
-        log.debug("class扫描完毕");
+        log.debug(resource + "的class扫描完毕!");
 
     }
 

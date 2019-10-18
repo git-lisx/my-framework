@@ -10,7 +10,7 @@ import cn.xian.webapp.service.DemoService;
 @MyService
 public class DemoServiceImpl implements DemoService {
     @Override
-    public String getInfo(String name, Integer age) {
-        return "service:" + name + ":" + age;
+    public String getInfo(String name) {
+        return "service:" + name;
     }
 }
