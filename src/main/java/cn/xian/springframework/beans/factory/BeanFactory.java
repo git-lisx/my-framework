@@ -9,6 +9,7 @@ import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.stereotype.MyRepository;
 import cn.xian.springframework.stereotype.MyService;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -22,10 +23,11 @@ import java.util.stream.Collectors;
  * @author lishixian
  * @date 2019/10/15 下午7:45
  */
+@Slf4j
 @Data
 public class BeanFactory {
 
-    private static BeanFactory beanFactory;
+    private static volatile BeanFactory beanFactory;
     private List<BeanDefinition> beanDefinitions;
 
     public BeanFactory() {
@@ -41,6 +43,7 @@ public class BeanFactory {
         if (beanFactory == null) {
             synchronized (BeanFactory.class) {
                 if (beanFactory == null) {
+                    //new操作在jvm内是非原子性的，需加volatile设置内存可见，确保线程安全
                     beanFactory = new BeanFactory();
                 }
             }
@@ -64,9 +67,10 @@ public class BeanFactory {
                         BeanDefinition fieldBeanDefinition = BeanFactory.instance().getBeanDefinition(name);
                         field.setAccessible(true);
                         try {
+                            // 依赖注入
                             field.set(bean, fieldBeanDefinition.getBean());
                         } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                            log.warn(e.getMessage(), e);
                         }
                     }
                 }
@@ -79,19 +83,19 @@ public class BeanFactory {
      * 初始化bean工厂，将当前项目中的class解析成beanDefinition加载beanDefinitionList
      * 只有指定注解的类才会由容器托管
      */
-    public void init() {
+    public void ioc() {
         List<Class> classes = ClassScanner.classes;
         for (Class clazz : classes) {
             Annotation[] annotations = clazz.getAnnotations();
             for (Annotation annotation : annotations) {
                 if (annotation instanceof MyController) {
-                    addBeanDefinition(clazz, BeanTypeEnum.CONTROLLER);
+                    initBeanDefinitionAndAddFactory(clazz, BeanTypeEnum.CONTROLLER);
                 } else if (annotation instanceof MyService) {
-                    addBeanDefinition(clazz, BeanTypeEnum.SERVICE);
+                    initBeanDefinitionAndAddFactory(clazz, BeanTypeEnum.SERVICE);
                 } else if (annotation instanceof MyRepository) {
-                    addBeanDefinition(clazz, BeanTypeEnum.REPOSITORY);
+                    initBeanDefinitionAndAddFactory(clazz, BeanTypeEnum.REPOSITORY);
                 } else if (annotation instanceof MyComponent) {
-                    addBeanDefinition(clazz, BeanTypeEnum.COMPONENT);
+                    initBeanDefinitionAndAddFactory(clazz, BeanTypeEnum.COMPONENT);
                 }
             }
         }
@@ -103,7 +107,7 @@ public class BeanFactory {
      * @param clazz    字节码
      * @param beanType bean类型
      */
-    private void addBeanDefinition(Class clazz, BeanTypeEnum beanType) {
+    private void initBeanDefinitionAndAddFactory(Class clazz, BeanTypeEnum beanType) {
         BeanDefinition beanDefinition = BeanDefinition.invoke(clazz);
         if (beanDefinition != null) {
             beanDefinition.setBeanType(beanType);

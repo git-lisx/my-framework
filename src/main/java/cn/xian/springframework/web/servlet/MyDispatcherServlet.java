@@ -24,18 +24,19 @@ public class MyDispatcherServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         //扫描所有class
+        log.debug("正在扫描所有class");
         ClassScanner.scan();
         log.debug("class扫描完毕！");
 
-        //初始化bean工厂，实例化对象，装载bean（IOC控制反转）
-        BeanFactory.instance().init();
+        //初始化bean工厂，装载bean（IOC控制反转）
+        BeanFactory.instance().ioc();
         log.debug("初始化bean工厂，bean装载完毕！");
         //依赖注入（DI）
         BeanFactory.injectDependency();
         log.debug("依赖注入完毕！");
 
         //建立uri与方法的映射关系
-        UriFactory.instance().init();
+        UriFactory.instance().initUriMapping();
         log.debug("uri与方法的映射关系建立完毕！");
     }
 

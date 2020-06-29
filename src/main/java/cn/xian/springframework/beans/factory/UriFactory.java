@@ -6,6 +6,7 @@ import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class UriFactory {
 
-    private static UriFactory uriFactory;
+    private static volatile UriFactory uriFactory;
     private List<UriMethodRelate> uriMethodRelates;
 
     public UriFactory() {
@@ -35,6 +36,7 @@ public class UriFactory {
         if (uriFactory == null) {
             synchronized (UriFactory.class) {
                 if (uriFactory == null) {
+                    //new操作在jvm内是非原子性的，需加volatile设置内存可见，确保线程安全
                     uriFactory = new UriFactory();
                 }
             }
@@ -64,7 +66,7 @@ public class UriFactory {
     /**
      * 建立uri与方法的映射关系
      */
-    public void init() {
+    public void initUriMapping() {
         List<BeanDefinition> controllerBeanDefinitions = BeanFactory.instance().getControllers();
         for (BeanDefinition controllerBeanDefinition : controllerBeanDefinitions) {
             Class<?> controllerClass = controllerBeanDefinition.getBean().getClass();
@@ -83,12 +85,10 @@ public class UriFactory {
                 for (Annotation methodAnnotation : methodAnnotations) {
                     if (methodAnnotation instanceof MyRequestMapping) {
                         String methodUri = ((MyRequestMapping) methodAnnotation).value();
-                        UriMethodRelate uriMethodRelate = new UriMethodRelate();
-                        String uri = uriStringBuilder.toString() + "/" + methodUri;
-                        uriMethodRelate.setUri(uri.replaceAll("//", "/"));
-                        uriMethodRelate.setClassName(controllerClass.getName());
+                        String uri = Paths.get(uriStringBuilder.toString(), methodUri).toString();
                         //暂不考虑重载的情况
-                        uriMethodRelate.setMethodName(method.getName());
+                        UriMethodRelate uriMethodRelate
+                                = new UriMethodRelate(uri, controllerClass.getName(), method.getName());
                         uriMethodRelates.add(uriMethodRelate);
                     }
                 }

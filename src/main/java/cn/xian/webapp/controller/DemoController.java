@@ -5,6 +5,10 @@ import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
 import cn.xian.webapp.service.DemoService;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 /**
  * @author lishixian
  * @date 2019/10/16 下午9:49
@@ -25,5 +29,11 @@ public class DemoController {
         return "返回值为：" + result;
     }
 
+
+    public static void main(String[] args) {
+        List<String> list = Arrays.asList("张三", "李四", "王五");
+        int nextInt = new Random().nextInt(list.size());
+        System.out.println("恭喜你中奖了：" + list.get(nextInt));
+    }
 
 }

@@ -31,7 +31,7 @@ public class ClassScanner {
         try {
             file = new File(resource.toURI());
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
             return;
         }
         log.debug("类扫描的路径为:" + file);
@@ -65,7 +65,7 @@ public class ClassScanner {
                     String absoluteClassName = absolutePath.substring(absolutePath.indexOf("classes.") + 8, absolutePath.lastIndexOf(".class"));
                     classes.add(Class.forName(absoluteClassName));
                 } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                    log.warn(e.getMessage(), e);
                 }
             }
         }
