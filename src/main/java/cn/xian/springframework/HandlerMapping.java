@@ -4,7 +4,7 @@ import cn.xian.springframework.beans.factory.BeanFactory;
 import cn.xian.springframework.beans.factory.UriFactory;
 import cn.xian.springframework.beans.factory.config.BeanDefinition;
 import cn.xian.springframework.beans.factory.config.MethodDefinition;
-import cn.xian.springframework.beans.factory.config.UriMethodRelate;
+import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -29,14 +29,14 @@ public class HandlerMapping {
      * @return 执行结果
      */
     public static String execute(String uri, Map<String, String[]> parameterMap) {
-        Optional<UriMethodRelate> uriMethodRelateOptional = UriFactory.instance().getUriMethodRelate(uri);
+        Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.instance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
             return "找不到" + uri + "对应的资源";
         }
-        UriMethodRelate uriMethodRelate = uriMethodRelateOptional.get();
-        BeanDefinition beanDefinition = BeanFactory.instance().getBeanDefinition(uriMethodRelate.getClassName());
+        UriMethodRelation uriMethodRelation = uriMethodRelateOptional.get();
+        BeanDefinition beanDefinition = BeanFactory.instance().getBeanDefinition(uriMethodRelation.getClassName());
         Object bean = beanDefinition.getBean();
-        MethodDefinition methodDefinition = beanDefinition.getMethodDefinition(uriMethodRelate.getMethodName());
+        MethodDefinition methodDefinition = beanDefinition.getMethodDefinition(uriMethodRelation.getMethodName());
         List<Object> params = new ArrayList<>();
         List<String> paramNames = methodDefinition.getParamNames();
         List<Class> paramTypes = methodDefinition.getParamTypes();

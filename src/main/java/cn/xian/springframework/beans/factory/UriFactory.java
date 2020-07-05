@@ -1,7 +1,7 @@
 package cn.xian.springframework.beans.factory;
 
 import cn.xian.springframework.beans.factory.config.BeanDefinition;
-import cn.xian.springframework.beans.factory.config.UriMethodRelate;
+import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
 
 import java.lang.annotation.Annotation;
@@ -21,10 +21,10 @@ import java.util.stream.Collectors;
 public class UriFactory {
 
     private static volatile UriFactory uriFactory;
-    private List<UriMethodRelate> uriMethodRelates;
+    private List<UriMethodRelation> uriMethodRelations;
 
     public UriFactory() {
-        uriMethodRelates = new ArrayList<>();
+        uriMethodRelations = new ArrayList<>();
     }
 
     /**
@@ -51,9 +51,9 @@ public class UriFactory {
      * @param uri uri
      * @return uri与方法的映射实例
      */
-    public Optional<UriMethodRelate> getUriMethodRelate(String uri) {
-        List<UriMethodRelate> collect = uriMethodRelates.stream()
-                .filter(uriMethodRelate -> uriMethodRelate.getUri().equals(uri)).collect(Collectors.toList());
+    public Optional<UriMethodRelation> getUriMethodRelate(String uri) {
+        List<UriMethodRelation> collect = uriMethodRelations.stream()
+                .filter(uriMethodRelation -> uriMethodRelation.getUri().equals(uri)).collect(Collectors.toList());
         if (collect.size() > 1) {
             throw new RuntimeException("uri重复了" + uri);
         }
@@ -87,9 +87,9 @@ public class UriFactory {
                         String methodUri = ((MyRequestMapping) methodAnnotation).value();
                         String uri = Paths.get(uriStringBuilder.toString(), methodUri).toString();
                         //暂不考虑重载的情况
-                        UriMethodRelate uriMethodRelate
-                                = new UriMethodRelate(uri, controllerClass.getName(), method.getName());
-                        uriMethodRelates.add(uriMethodRelate);
+                        UriMethodRelation uriMethodRelation
+                                = new UriMethodRelation(uri, controllerClass.getName(), method.getName());
+                        uriMethodRelations.add(uriMethodRelation);
                     }
                 }
             }

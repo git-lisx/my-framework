@@ -11,7 +11,7 @@ import lombok.Data;
  */
 @AllArgsConstructor
 @Data
-public class UriMethodRelate {
+public class UriMethodRelation {
 
     private String uri;
     private String className;
