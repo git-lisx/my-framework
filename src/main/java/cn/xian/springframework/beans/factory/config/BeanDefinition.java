@@ -4,8 +4,10 @@ import cn.xian.springframework.beans.factory.utils.ClassUtil;
 import lombok.Data;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * bean的定义
@@ -14,7 +16,7 @@ import java.util.*;
  * @date 2019/10/15 下午7:58
  */
 @Data
-public class BeanDefinition<T> {
+public class BeanDefinition {
 
     /**
      * 别名
@@ -40,7 +42,7 @@ public class BeanDefinition<T> {
      * @param clazz 字节码
      * @return BeanDefinition
      */
-    public static BeanDefinition invoke(Class clazz) {
+    public static BeanDefinition parse(Class clazz) {
         BeanDefinition beanDefinition = new BeanDefinition();
 
         char[] chars = clazz.getSimpleName().toCharArray();

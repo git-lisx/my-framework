@@ -23,7 +23,7 @@ public class UriFactory {
     private static volatile UriFactory uriFactory;
     private List<UriMethodRelation> uriMethodRelations;
 
-    public UriFactory() {
+    private UriFactory() {
         uriMethodRelations = new ArrayList<>();
     }
 
@@ -32,7 +32,7 @@ public class UriFactory {
      *
      * @return uri工厂实例
      */
-    public static UriFactory instance() {
+    public static UriFactory getInstance() {
         if (uriFactory == null) {
             synchronized (UriFactory.class) {
                 if (uriFactory == null) {
@@ -67,7 +67,7 @@ public class UriFactory {
      * 建立uri与方法的映射关系
      */
     public void initUriMapping() {
-        List<BeanDefinition> controllerBeanDefinitions = BeanFactory.instance().getControllers();
+        List<BeanDefinition> controllerBeanDefinitions = BeanFactory.getInstance().getControllers();
         for (BeanDefinition controllerBeanDefinition : controllerBeanDefinitions) {
             Class<?> controllerClass = controllerBeanDefinition.getBean().getClass();
             Annotation[] classAnnotations = controllerClass.getDeclaredAnnotations();

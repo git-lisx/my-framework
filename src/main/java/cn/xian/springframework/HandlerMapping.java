@@ -29,12 +29,12 @@ public class HandlerMapping {
      * @return 执行结果
      */
     public static String execute(String uri, Map<String, String[]> parameterMap) {
-        Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.instance().getUriMethodRelate(uri);
+        Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
             return "找不到" + uri + "对应的资源";
         }
         UriMethodRelation uriMethodRelation = uriMethodRelateOptional.get();
-        BeanDefinition beanDefinition = BeanFactory.instance().getBeanDefinition(uriMethodRelation.getClassName());
+        BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(uriMethodRelation.getClassName());
         Object bean = beanDefinition.getBean();
         MethodDefinition methodDefinition = beanDefinition.getMethodDefinition(uriMethodRelation.getMethodName());
         List<Object> params = new ArrayList<>();

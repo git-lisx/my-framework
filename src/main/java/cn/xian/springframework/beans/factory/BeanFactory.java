@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * bean工厂
+ * bean工厂,使用了设计模式：工厂+单例
  *
  * @author lishixian
  * @date 2019/10/15 下午7:45
@@ -30,7 +30,7 @@ public class BeanFactory {
     private static volatile BeanFactory beanFactory;
     private List<BeanDefinition> beanDefinitions;
 
-    public BeanFactory() {
+    private BeanFactory() {
         beanDefinitions = new ArrayList<>();
     }
 
@@ -39,7 +39,7 @@ public class BeanFactory {
      *
      * @return bean工厂
      */
-    public static BeanFactory instance() {
+    public static BeanFactory getInstance() {
         if (beanFactory == null) {
             synchronized (BeanFactory.class) {
                 if (beanFactory == null) {
@@ -55,7 +55,7 @@ public class BeanFactory {
      * 注入依赖
      */
     public static void injectDependency() {
-        List<BeanDefinition> beanDefinitionList = BeanFactory.instance().getBeanDefinitions();
+        List<BeanDefinition> beanDefinitionList = BeanFactory.getInstance().getBeanDefinitions();
         for (BeanDefinition beanDefinition : beanDefinitionList) {
             Object bean = beanDefinition.getBean();
             Field[] fields = bean.getClass().getDeclaredFields();
@@ -64,7 +64,7 @@ public class BeanFactory {
                 for (Annotation annotation : annotations) {
                     if (annotation instanceof MyAutowired) {
                         String name = field.getName();
-                        BeanDefinition fieldBeanDefinition = BeanFactory.instance().getBeanDefinition(name);
+                        BeanDefinition fieldBeanDefinition = BeanFactory.getInstance().getBeanDefinition(name);
                         field.setAccessible(true);
                         try {
                             // 依赖注入
@@ -108,7 +108,8 @@ public class BeanFactory {
      * @param beanType bean类型
      */
     private void initBeanDefinitionAndAddFactory(Class clazz, BeanTypeEnum beanType) {
-        BeanDefinition beanDefinition = BeanDefinition.invoke(clazz);
+        // 将class解析成beanDefinition
+        BeanDefinition beanDefinition = BeanDefinition.parse(clazz);
         if (beanDefinition != null) {
             beanDefinition.setBeanType(beanType);
             beanDefinitions.add(beanDefinition);
