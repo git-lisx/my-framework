@@ -10,18 +10,20 @@
     <packaging>war</packaging>
 
     <dependencies>
+
+        <!--SpringMVC基于servlet技术开发的，由于使用的JavaSE的JDK，需引入servlet包-->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
         </dependency>
 
+        <!--用于根据字节码获取方法中的参数名-->
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
             <version>3.22.0-GA</version>
         </dependency>
-
 
         <!--使用cglib代理-->
         <dependency>
@@ -64,12 +66,6 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <!--引入maven-javadoc-plugin插件-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-<!--                <version>3.0.0</version>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 

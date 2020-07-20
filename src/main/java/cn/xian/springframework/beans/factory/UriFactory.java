@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
  */
 public class UriFactory {
 
+    /**
+     * new操作在jvm内是非原子性的，需加volatile设置禁止指令重排，确保线程安全，
+     * 即：在堆内存开辟空间->调用构造方法初始化堆内存数据->将堆内存地址保存到栈内存中，该对象指向堆内存
+     */
     private static volatile UriFactory uriFactory;
     private List<UriMethodRelation> uriMethodRelations;
 
@@ -36,7 +40,6 @@ public class UriFactory {
         if (uriFactory == null) {
             synchronized (UriFactory.class) {
                 if (uriFactory == null) {
-                    //new操作在jvm内是非原子性的，需加volatile设置内存可见，确保线程安全
                     uriFactory = new UriFactory();
                 }
             }
