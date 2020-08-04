@@ -1,16 +1,17 @@
 package cn.xian.springframework.beans.factory;
 
 import cn.xian.springframework.beans.factory.config.BeanDefinition;
+import cn.xian.springframework.beans.factory.config.BeanTypeEnum;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * uri工厂类
@@ -25,10 +26,12 @@ public class UriFactory {
      * 即：在堆内存开辟空间->调用构造方法初始化堆内存数据->将堆内存地址保存到栈内存中，该对象指向堆内存
      */
     private static volatile UriFactory uriFactory;
-    private List<UriMethodRelation> uriMethodRelations;
+    //    private final List<UriMethodRelation> uriMethodRelations;
+    private final Map<String, UriMethodRelation> uriMethodRelationMap;
 
     private UriFactory() {
-        uriMethodRelations = new ArrayList<>();
+//        uriMethodRelations = new ArrayList<>();
+        uriMethodRelationMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -55,24 +58,21 @@ public class UriFactory {
      * @return uri与方法的映射实例
      */
     public Optional<UriMethodRelation> getUriMethodRelate(String uri) {
-        List<UriMethodRelation> collect = uriMethodRelations.stream()
-                .filter(uriMethodRelation -> uriMethodRelation.getUri().equals(uri)).collect(Collectors.toList());
-        if (collect.size() > 1) {
-            throw new RuntimeException("uri重复了" + uri);
-        }
-        if (collect.size() == 1) {
-            return Optional.of(collect.get(0));
-        }
-        return Optional.empty();
+        return uriMethodRelationMap.containsKey(uri) ? Optional.of(uriMethodRelationMap.get(uri)) : Optional.empty();
     }
 
     /**
      * 建立uri与方法的映射关系
      */
     public void initUriMapping() {
-        List<BeanDefinition> controllerBeanDefinitions = BeanFactory.getInstance().getControllers();
-        for (BeanDefinition controllerBeanDefinition : controllerBeanDefinitions) {
-            Class<?> controllerClass = controllerBeanDefinition.getBean().getClass();
+        Set<String> beanIds = BeanFactory.getInstance().getAllBeanIds();
+        for (String beanId : beanIds) {
+            BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(beanId);
+            if (!BeanTypeEnum.CONTROLLER.equals(beanDefinition.getBeanType())) {
+                continue;
+            }
+
+            Class<?> controllerClass = beanDefinition.getOriginalBean().getClass();
             Annotation[] classAnnotations = controllerClass.getDeclaredAnnotations();
             //获取类上的@MyRequestMapping的值
             StringBuilder uriStringBuilder = new StringBuilder("/");
@@ -90,9 +90,12 @@ public class UriFactory {
                         String methodUri = ((MyRequestMapping) methodAnnotation).value();
                         String uri = Paths.get(uriStringBuilder.toString(), methodUri).toString();
                         //暂不考虑重载的情况
-                        UriMethodRelation uriMethodRelation
-                                = new UriMethodRelation(uri, controllerClass.getName(), method.getName());
-                        uriMethodRelations.add(uriMethodRelation);
+                        UriMethodRelation uriMethodRelation = new UriMethodRelation(uri, beanId, method.getName());
+                        boolean containsKey = uriMethodRelationMap.containsKey(uri);
+                        if (containsKey) {
+                            throw new RuntimeException("uri重复了，uri:" + uri);
+                        }
+                        uriMethodRelationMap.put(uri, uriMethodRelation);
                     }
                 }
             }

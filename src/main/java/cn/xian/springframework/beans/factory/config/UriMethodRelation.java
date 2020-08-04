@@ -14,7 +14,7 @@ import lombok.Data;
 public class UriMethodRelation {
 
     private String uri;
-    private String className;
+    private String beanId;
     private String methodName;
 
 }

@@ -1,8 +1,11 @@
 package cn.xian.springframework.beans.factory.config;
 
+import cn.xian.springframework.aop.proxy.AopProxyFactory;
 import cn.xian.springframework.beans.factory.utils.ClassUtil;
+import cn.xian.springframework.transaction.annotation.MyTransactional;
 import lombok.Data;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,21 +22,38 @@ import java.util.Optional;
 public class BeanDefinition {
 
     /**
-     * 别名
+     * bean名称
      */
     private String name;
-    // 类名
+    /**
+     * 全路径类名
+     */
     private String className;
-    // bean的类型
+    /**
+     * bean的类型
+     */
     private BeanTypeEnum beanType;
-    // aop对象
+    /**
+     * aop对象
+     */
     private Object aop;
-    // 对象
+    /**
+     * 对象
+     */
     private Object bean;
+
+
+    /**
+     * 方法定义的集合
+     */
     private List<MethodDefinition> methodDefinitions;
 
     public BeanDefinition() {
         methodDefinitions = new ArrayList<>();
+    }
+
+    public Object getOriginalBean() {
+        return aop == null ? bean : aop;
     }
 
     /**
@@ -50,8 +70,17 @@ public class BeanDefinition {
         beanDefinition.setName(String.valueOf(chars));
         beanDefinition.setClassName(clazz.getName());
         try {
-            Object o = clazz.newInstance();
-            beanDefinition.setBean(o);
+
+            List<Annotation> annotations = Arrays.asList(clazz.getAnnotations());
+            boolean match = annotations.stream().anyMatch(annotation -> annotation instanceof MyTransactional);
+            Object bean = clazz.newInstance();
+            if (match) {
+                // 创建代理对象
+                Object aopProxyBean = AopProxyFactory.createAopProxy(bean);
+                beanDefinition.setAop(aopProxyBean);
+
+            }
+            beanDefinition.setBean(bean);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
@@ -85,23 +114,6 @@ public class BeanDefinition {
         return methodDefinitions;
     }
 
-
-    /**
-     * 根据类名或别名获取BeanDefinition
-     *
-     * @param nameOrClassName 别名或类名
-     * @return BeanDefinition
-     */
-    public BeanDefinition getBeanDefinition(String nameOrClassName) {
-        if (name != null && name.equals(nameOrClassName)) {
-            return this;
-        }
-        if (className != null && className.equals(nameOrClassName)) {
-            return this;
-        }
-        return null;
-
-    }
 
     /**
      * todo 暂未考虑重载的问题

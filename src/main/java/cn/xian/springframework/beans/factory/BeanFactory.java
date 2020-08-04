@@ -8,14 +8,14 @@ import cn.xian.springframework.stereotype.MyComponent;
 import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.stereotype.MyRepository;
 import cn.xian.springframework.stereotype.MyService;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * bean工厂,使用了设计模式：工厂+单例
@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
  * @date 2019/10/15 下午7:45
  */
 @Slf4j
-@Data
 public class BeanFactory {
 
     /**
@@ -32,10 +31,11 @@ public class BeanFactory {
      * 即：在堆内存开辟空间->调用构造方法初始化堆内存数据->将堆内存地址保存到栈内存中，该对象指向堆内存
      */
     private static volatile BeanFactory beanFactory;
-    private List<BeanDefinition> beanDefinitions;
+
+    private final Map<String, BeanDefinition> beanDefinitionMap;
 
     private BeanFactory() {
-        beanDefinitions = new ArrayList<>();
+        beanDefinitionMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -55,12 +55,14 @@ public class BeanFactory {
     }
 
     /**
+     * 找到拥有@MyAutowired注解的属性，并注入相应的bean
      * 注入依赖
      */
-    public static void injectDependency() {
-        List<BeanDefinition> beanDefinitionList = BeanFactory.getInstance().getBeanDefinitions();
-        for (BeanDefinition beanDefinition : beanDefinitionList) {
-            Object bean = beanDefinition.getBean();
+    public void injectDependency() {
+        Set<String> beanIds = beanFactory.getAllBeanIds();
+        for (String beanId : beanIds) {
+            BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(beanId);
+            Object bean = beanDefinition.getOriginalBean();
             Field[] fields = bean.getClass().getDeclaredFields();
             for (Field field : fields) {
                 Annotation[] annotations = field.getAnnotations();
@@ -71,7 +73,8 @@ public class BeanFactory {
                         field.setAccessible(true);
                         try {
                             // 依赖注入
-                            field.set(bean, fieldBeanDefinition.getBean());
+                            Object originalBean = fieldBeanDefinition.getOriginalBean();
+                            field.set(bean, originalBean);
                         } catch (IllegalAccessException e) {
                             log.warn(e.getMessage(), e);
                         }
@@ -115,36 +118,26 @@ public class BeanFactory {
         BeanDefinition beanDefinition = BeanDefinition.parse(clazz);
         if (beanDefinition != null) {
             beanDefinition.setBeanType(beanType);
-            beanDefinitions.add(beanDefinition);
+            boolean containsKey = beanDefinitionMap.containsKey(beanDefinition.getName());
+            if (containsKey) {
+                throw new RuntimeException("beanId重复了，beanId：" + beanDefinition.getName());
+            }
+            beanDefinitionMap.put(beanDefinition.getName(), beanDefinition);
         }
     }
 
 
     /**
-     * 获取工厂里的所有controller的bean定义
+     * 根据类名获取BeanDefinition
      *
-     * @return 工厂里的所有controller的bean定义
-     */
-    public List<BeanDefinition> getControllers() {
-        return beanDefinitions.stream()
-                .filter(beanDefinition -> BeanTypeEnum.CONTROLLER.equals(beanDefinition.getBeanType()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 根据别名或类名获取BeanDefinition
-     *
-     * @param nameOrClassName 别名或类名
+     * @param beanId 类名(beanId)
      * @return BeanDefinition
      */
-    public BeanDefinition getBeanDefinition(String nameOrClassName) {
-        for (BeanDefinition beanDefinition : beanDefinitions) {
-            BeanDefinition beanDefinition1 = beanDefinition.getBeanDefinition(nameOrClassName);
-            if (beanDefinition1 != null) {
-                return beanDefinition1;
-            }
-        }
-        return null;
+    public BeanDefinition getBeanDefinition(String beanId) {
+        return beanDefinitionMap.get(beanId);
     }
 
+    public Set<String> getAllBeanIds() {
+        return beanDefinitionMap.keySet();
+    }
 }

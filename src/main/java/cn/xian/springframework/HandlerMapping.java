@@ -1,13 +1,11 @@
 package cn.xian.springframework;
 
 import cn.xian.springframework.beans.factory.BeanFactory;
-import cn.xian.springframework.beans.factory.UriFactory;
 import cn.xian.springframework.beans.factory.config.BeanDefinition;
 import cn.xian.springframework.beans.factory.config.MethodDefinition;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,36 +20,32 @@ public class HandlerMapping {
 
 
     /**
-     * 根据uri找到对应的方法并执行
+     * 执行对应的方法
      *
-     * @param uri          uri
-     * @param parameterMap 参数列表
+     * @param uriMethodRelation uri与方法的映射对象
+     * @param parameterMap      参数列表
      * @return 执行结果
      */
-    public static String execute(String uri, Map<String, String[]> parameterMap) {
-        Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
-        if (!uriMethodRelateOptional.isPresent()) {
-            return "找不到" + uri + "对应的资源";
-        }
-        UriMethodRelation uriMethodRelation = uriMethodRelateOptional.get();
-        BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(uriMethodRelation.getClassName());
-        Object bean = beanDefinition.getBean();
+    public static Optional<String> execute(UriMethodRelation uriMethodRelation, Map<String, String[]> parameterMap) {
+        // 1.通过 UriMethodRelation，找到 BeanDefinition 和 MethodDefinition
+        BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(uriMethodRelation.getBeanId());
         MethodDefinition methodDefinition = beanDefinition.getMethodDefinition(uriMethodRelation.getMethodName());
-        List<Object> params = new ArrayList<>();
+
+        // 2.参数绑定
         List<String> paramNames = methodDefinition.getParamNames();
-        List<Class> paramTypes = methodDefinition.getParamTypes();
-        for (String paramName : paramNames) {
+        Object[] params = paramNames.stream().map(paramName -> {
             String[] paramValues = parameterMap.get(paramName);
             //暂只支持简单类型的参数绑定
-            String paramValue = paramValues != null ? paramValues[0] : null;
-            params.add(paramValue);
-        }
+            return paramValues != null ? paramValues[0] : null;
+        }).toArray();
+
         try {
-            Object result = methodDefinition.getMethod().invoke(bean, params.toArray());
-            return result.toString();
+            // 3.通过反射执行对应的方法
+            Object result = methodDefinition.getMethod().invoke(beanDefinition.getOriginalBean(), params);
+            return result == null ? Optional.empty() : Optional.of(result.toString());
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            return "服务器异常！" + e.getMessage();
+            return Optional.of("服务器异常！" + e.getMessage());
         }
     }
 }
