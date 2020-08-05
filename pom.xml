@@ -7,51 +7,11 @@
     <groupId>cn.xian</groupId>
     <artifactId>my-spring-framework</artifactId>
     <version>1.0</version>
-    <packaging>war</packaging>
-
-    <dependencies>
-
-        <!--SpringMVC基于servlet技术开发的，由于使用的JavaSE的JDK，需引入servlet包-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-
-        <!--用于根据字节码获取方法中的参数名-->
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.22.0-GA</version>
-        </dependency>
-
-        <!--使用cglib代理-->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.2.5</version>
-        </dependency>
-
-        <!-- 引入lombok，使用@Data可以省略set get方法 @Slf4j直接使用log打印日志 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.16.20</version>
-        </dependency>
-        <!-- 日志打印 -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.26</version>
-            <scope>compile</scope>
-        </dependency>
-
-    </dependencies>
+    <modules>
+        <module>web-app</module>
+        <module>spring-framework</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <build>
         <plugins>
