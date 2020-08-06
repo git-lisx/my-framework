@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 使用javassist字节码增强技术，通过class获取方法的参数名
+ *
  * @author lishixian
  * @date 2019/10/17 下午7:26
  */
@@ -24,7 +26,7 @@ public class ClassUtil {
      * @param clazz  字节码
      * @return 当前方法的所有参数名
      */
-    public static List<String> getParamNames(Method method, Class clazz) {
+    public static List<String> getParamNames(Method method, Class<?> clazz) {
         List<String> paramNames = new ArrayList<>();
 
         if (method.getParameters().length == 0) {

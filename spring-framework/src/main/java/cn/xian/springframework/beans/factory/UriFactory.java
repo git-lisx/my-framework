@@ -26,11 +26,9 @@ public class UriFactory {
      * 即：在堆内存开辟空间->调用构造方法初始化堆内存数据->将堆内存地址保存到栈内存中，该对象指向堆内存
      */
     private static volatile UriFactory uriFactory;
-    //    private final List<UriMethodRelation> uriMethodRelations;
     private final Map<String, UriMethodRelation> uriMethodRelationMap;
 
     private UriFactory() {
-//        uriMethodRelations = new ArrayList<>();
         uriMethodRelationMap = new ConcurrentHashMap<>();
     }
 

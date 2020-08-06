@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 
-import java.util.Arrays;
-
 
 /**
  * cglib通过生成子类来实现动态代理
@@ -30,18 +28,16 @@ public class CglibProxySubject {
         // 代理类增强的方法
         MethodInterceptor methodInterceptor = (obj, method, args, proxy) -> {
             log.info("cglib动态代理.......开启事务");
-            Object result;
             try {
                 // 执行被代理的方法
-                result = proxy.invokeSuper(obj, args);
-            } catch (RuntimeException e) {
+                Object result = proxy.invokeSuper(obj, args);
+                log.info("cglib动态代理.......提交事务");
+                return result;
+            } catch (Exception e) {
+                log.error(e.getMessage());
                 log.info("cglib动态代理.......事务回滚");
-                log.error(e.getMessage(), e);
-                return null;
+                throw e;
             }
-            log.info("代理方法：" + method.getName() + "；参数：" + Arrays.toString(args));
-            log.info("cglib动态代理.......提交事务");
-            return result;
         };
         enhancer.setCallback(methodInterceptor);
 

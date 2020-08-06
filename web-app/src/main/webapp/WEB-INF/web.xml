@@ -1,4 +1,9 @@
 <web-app>
+
+    <listener>
+        <listener-class>cn.xian.springframework.web.servlet.MyServletContextListener</listener-class>
+    </listener>
+
     <servlet>
         <servlet-name>mySpringFramework</servlet-name>
         <servlet-class>cn.xian.springframework.web.servlet.MyDispatcherServlet</servlet-class>

@@ -90,8 +90,8 @@ public class BeanFactory {
      * 只有指定注解的类才会由容器托管
      */
     public void ioc() {
-        List<Class> classes = ClassScanner.classes;
-        for (Class clazz : classes) {
+        List<Class<?>> classes = ClassScanner.classes;
+        for (Class<?> clazz : classes) {
             Annotation[] annotations = clazz.getAnnotations();
             for (Annotation annotation : annotations) {
                 if (annotation instanceof MyController) {
@@ -113,7 +113,7 @@ public class BeanFactory {
      * @param clazz    字节码
      * @param beanType bean类型
      */
-    private void initBeanDefinitionAndAddFactory(Class clazz, BeanTypeEnum beanType) {
+    private void initBeanDefinitionAndAddFactory(Class<?> clazz, BeanTypeEnum beanType) {
         // 将class解析成beanDefinition
         BeanDefinition beanDefinition = BeanDefinition.parse(clazz);
         if (beanDefinition != null) {

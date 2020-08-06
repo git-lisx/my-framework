@@ -10,5 +10,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface MyRequestMapping {
+    
     String value() default "";
+    
 }

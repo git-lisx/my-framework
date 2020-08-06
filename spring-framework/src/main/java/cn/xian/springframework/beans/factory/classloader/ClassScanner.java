@@ -19,7 +19,7 @@ import java.util.Queue;
 @Slf4j
 public class ClassScanner {
 
-    public static List<Class> classes = new ArrayList<>();
+    public static List<Class<?>> classes = new ArrayList<>();
 
     /**
      * 扫描当前项目的所有class

@@ -3,9 +3,9 @@ package cn.xian.webapp.controller;
 import cn.xian.springframework.beans.factory.annotation.MyAutowired;
 import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
-import cn.xian.webapp.component.TransactionComponent;
+import cn.xian.webapp.component.CglibProxyTransactionComponent;
 import cn.xian.webapp.service.DemoService;
-import cn.xian.webapp.service.TransactionService;
+import cn.xian.webapp.service.JdkProxyTransactionService;
 
 /**
  * @author lishixian
@@ -22,9 +22,9 @@ public class DemoController {
     private DemoService demoServiceImpl;
 
     @MyAutowired
-    private TransactionService transactionServiceImpl;
+    private JdkProxyTransactionService jdkProxyTransactionServiceImpl;
     @MyAutowired
-    private TransactionComponent transactionComponent;
+    private CglibProxyTransactionComponent cglibProxyTransactionComponent;
 
     @MyRequestMapping("/mvc")
     public String mvc(String name) {
@@ -33,15 +33,19 @@ public class DemoController {
     }
 
     @MyRequestMapping("/cglib/transaction")
-    public String cglibTransaction() {
-        transactionServiceImpl.add();
+    public String cglibTransaction(String name) {
+
+        cglibProxyTransactionComponent.add(name);
+
         return "cglib动态代理实现事务管理";
     }
 
 
     @MyRequestMapping("/jdk/transaction")
-    public String jdkTransaction() {
-        transactionComponent.add();
+    public String jdkTransaction(String name) {
+
+        jdkProxyTransactionServiceImpl.add(name);
+
         return "jdk动态代理实现事务管理";
     }
 

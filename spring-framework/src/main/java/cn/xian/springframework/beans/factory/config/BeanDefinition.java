@@ -7,10 +7,11 @@ import lombok.Data;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * bean的定义
@@ -46,10 +47,11 @@ public class BeanDefinition {
     /**
      * 方法定义的集合
      */
-    private List<MethodDefinition> methodDefinitions;
+    private Map<String, MethodDefinition> methodDefinitionMap;
 
     public BeanDefinition() {
-        methodDefinitions = new ArrayList<>();
+
+        methodDefinitionMap = new ConcurrentHashMap<>();
     }
 
     public Object getOriginalBean() {
@@ -62,7 +64,7 @@ public class BeanDefinition {
      * @param clazz 字节码
      * @return BeanDefinition
      */
-    public static BeanDefinition parse(Class clazz) {
+    public static BeanDefinition parse(Class<?> clazz) {
         BeanDefinition beanDefinition = new BeanDefinition();
 
         char[] chars = clazz.getSimpleName().toCharArray();
@@ -70,7 +72,6 @@ public class BeanDefinition {
         beanDefinition.setName(String.valueOf(chars));
         beanDefinition.setClassName(clazz.getName());
         try {
-
             List<Annotation> annotations = Arrays.asList(clazz.getAnnotations());
             boolean match = annotations.stream().anyMatch(annotation -> annotation instanceof MyTransactional);
             Object bean = clazz.newInstance();
@@ -78,14 +79,13 @@ public class BeanDefinition {
                 // 创建代理对象
                 Object aopProxyBean = AopProxyFactory.createAopProxy(bean);
                 beanDefinition.setAop(aopProxyBean);
-
             }
             beanDefinition.setBean(bean);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
-        beanDefinition.setMethodDefinitions(invokeMethodDefinition(clazz));
+        beanDefinition.setMethodDefinitionMap(invokeMethodDefinition(clazz));
         return beanDefinition;
     }
 
@@ -95,23 +95,19 @@ public class BeanDefinition {
      * @param clazz 字节码
      * @return 返回所有MethodDefinition
      */
-    private static List<MethodDefinition> invokeMethodDefinition(Class clazz) {
-        List<MethodDefinition> methodDefinitions = new ArrayList<>();
+    private static Map<String, MethodDefinition> invokeMethodDefinition(Class<?> clazz) {
         Method[] clazzMethods = clazz.getDeclaredMethods();
-        for (Method method : clazzMethods) {
-            MethodDefinition methodDefinition = new MethodDefinition();
-            methodDefinition.setMethod(method);
-            methodDefinition.setMethodName(method.getName());
-            //获取method的所有参数类型
-            Class[] paramsType = method.getParameterTypes();
-            methodDefinition.setParamTypes(Arrays.asList(paramsType));
-            //获取method的所有参数名称
-            List<String> paramNames = ClassUtil.getParamNames(method, clazz);
+        return Arrays.stream(clazzMethods)
+                .collect(Collectors.toMap(Method::getName, method -> {
 
-            methodDefinition.setParamNames(paramNames);
-            methodDefinitions.add(methodDefinition);
-        }
-        return methodDefinitions;
+                    //获取method的所有参数类型
+                    Class<?>[] paramsType = method.getParameterTypes();
+                    List<Class<?>> paramsTypes = Arrays.asList(paramsType);
+                    //获取method的所有参数名称
+                    List<String> paramNames = ClassUtil.getParamNames(method, clazz);
+
+                    return new MethodDefinition(paramsTypes, paramNames, method.getName(), method);
+                }));
     }
 
 
@@ -123,9 +119,10 @@ public class BeanDefinition {
      * @return MethodDefinition
      */
     public MethodDefinition getMethodDefinition(String methodName) {
-        Optional<MethodDefinition> methodDefinitionOptional = methodDefinitions.stream()
-                .filter(methodDefinition -> methodDefinition.getMethodName().equals(methodName)).findFirst();
-        return methodDefinitionOptional.orElse(null);
+        if (!methodDefinitionMap.containsKey(methodName)) {
+            throw new RuntimeException(methodName + "方法为找到");
+        }
+        return methodDefinitionMap.get(methodName);
     }
 
 

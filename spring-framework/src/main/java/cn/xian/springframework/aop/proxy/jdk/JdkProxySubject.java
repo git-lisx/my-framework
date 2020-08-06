@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Arrays;
 
 /**
  * @author lishixian
@@ -28,17 +27,15 @@ public class JdkProxySubject {
 
         InvocationHandler invocationHandler = (Object proxy, Method method, Object[] args) -> {
             log.info("jdk动态代理......开启事务");
-            Object result;
             try {
-                result = method.invoke(realSubject, args);
-            } catch (RuntimeException e) {
+                Object result = method.invoke(realSubject, args);
+                log.info("jdk动态代理......提交事务");
+                return result;
+            } catch (Exception e) {
+                log.error(e.getMessage());
                 log.info("jdk动态代理.......事务回滚");
-                log.error(e.getMessage(), e);
-                return null;
+                throw e;
             }
-            log.info("代理方法：" + method.getName() + "；参数：" + Arrays.toString(args));
-            log.info("jdk动态代理......提交事务");
-            return result;
         };
         ClassLoader contextClassLoader = realSubject.getClass().getClassLoader();
 
