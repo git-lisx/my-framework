@@ -24,6 +24,6 @@ public class DemoServiceImpl implements DemoService {
         String luckyViewers = list.get(nextInt);
 
         log.info("幸运观众：" + luckyViewers);
-        return "幸运观众：" + luckyViewers;
+        return name + "，幸运观众：" + luckyViewers;
     }
 }

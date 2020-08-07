@@ -28,8 +28,10 @@ public class DemoController {
 
     @MyRequestMapping("/mvc")
     public String mvc(String name) {
+
         String result = demoServiceImpl.getInfo(name);
-        return "返回值为：" + result;
+
+        return "接收到的参数：" + result;
     }
 
     @MyRequestMapping("/cglib/transaction")
