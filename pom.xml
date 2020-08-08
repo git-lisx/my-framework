@@ -15,15 +15,18 @@
 
     <build>
         <plugins>
-            <!-- 解决编译时的编码问题 -->
+            <!-- 设定JDK版本,设置编译后保留接口方法的参数名 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
+                    <!-- 编译后保留接口方法的参数名 -->
+                    <compilerArgument>-parameters</compilerArgument>
                     <source>8</source>
                     <target>8</target>
                     <encoding>UTF-8</encoding>
+                    <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
         </plugins>

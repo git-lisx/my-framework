@@ -1,15 +1,16 @@
 package cn.xian.springframework.beans.factory.config;
 
 import cn.xian.springframework.aop.proxy.AopProxyFactory;
-import cn.xian.springframework.beans.factory.utils.ClassUtil;
 import cn.xian.springframework.transaction.annotation.MyTransactional;
 import lombok.Data;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -104,7 +105,7 @@ public class BeanDefinition {
                     Class<?>[] paramsType = method.getParameterTypes();
                     List<Class<?>> paramsTypes = Arrays.asList(paramsType);
                     //获取method的所有参数名称
-                    List<String> paramNames = ClassUtil.getParamNames(method, clazz);
+                    Set<String> paramNames = Arrays.stream(method.getParameters()).map(Parameter::getName).collect(Collectors.toSet());
 
                     return new MethodDefinition(paramsTypes, paramNames, method.getName(), method);
                 }));

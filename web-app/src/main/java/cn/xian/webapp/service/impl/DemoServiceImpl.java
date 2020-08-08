@@ -15,6 +15,7 @@ import java.util.Random;
 @Slf4j
 @MyService
 public class DemoServiceImpl implements DemoService {
+
     @Override
     public String getInfo(String name) {
 

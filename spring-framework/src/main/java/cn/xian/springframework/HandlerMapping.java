@@ -6,9 +6,9 @@ import cn.xian.springframework.beans.factory.config.MethodDefinition;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 方法执行器
@@ -32,7 +32,7 @@ public class HandlerMapping {
         MethodDefinition methodDefinition = beanDefinition.getMethodDefinition(uriMethodRelation.getMethodName());
 
         // 2.参数绑定
-        List<String> paramNames = methodDefinition.getParamNames();
+        Set<String> paramNames = methodDefinition.getParamNames();
         Object[] params = paramNames.stream().map(paramName -> {
             String[] paramValues = parameterMap.get(paramName);
             //暂只支持简单类型的参数绑定

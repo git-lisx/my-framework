@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import static cn.xian.springframework.web.constant.WebConstant.TEXT_HTML_UTF_8;
+
 /**
  * @author lishixian
  * @date 2019/10/15 下午8:39
@@ -35,6 +37,7 @@ public class MyDispatcherServlet extends HttpServlet {
 
     private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+        response.setContentType(TEXT_HTML_UTF_8);
         String uri = request.getRequestURI();
         //根据uri找到对应的方法执行
         Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
