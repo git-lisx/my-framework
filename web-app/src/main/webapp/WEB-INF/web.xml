@@ -1,13 +1,17 @@
 <web-app>
 
+    <!--监听器，用于初始化容器-->
     <listener>
         <listener-class>cn.xian.springframework.web.servlet.MyServletContextListener</listener-class>
     </listener>
 
+    <!--配置前端控制器-->
     <servlet>
         <servlet-name>mySpringFramework</servlet-name>
         <servlet-class>cn.xian.springframework.web.servlet.MyDispatcherServlet</servlet-class>
     </servlet>
+
+    <!--配置映射规则-->
     <servlet-mapping>
         <servlet-name>mySpringFramework</servlet-name>
         <url-pattern>/*</url-pattern>
