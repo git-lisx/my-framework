@@ -41,7 +41,7 @@ public class HandlerMapping {
 
         try {
             // 3.通过反射执行对应的方法
-            Object result = methodDefinition.getMethod().invoke(beanDefinition.getOriginalBean(), params);
+            Object result = methodDefinition.getMethod().invoke(beanDefinition.getFinalTargetBean(), params);
             return result == null ? Optional.empty() : Optional.of(result.toString());
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();

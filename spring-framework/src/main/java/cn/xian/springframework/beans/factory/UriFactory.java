@@ -70,7 +70,7 @@ public class UriFactory {
                 continue;
             }
 
-            Class<?> controllerClass = beanDefinition.getOriginalBean().getClass();
+            Class<?> controllerClass = beanDefinition.getFinalTargetBean().getClass();
             Annotation[] classAnnotations = controllerClass.getDeclaredAnnotations();
             //获取类上的@MyRequestMapping的值
             StringBuilder uriStringBuilder = new StringBuilder("/");

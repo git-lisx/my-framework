@@ -19,7 +19,11 @@ import java.util.Queue;
 @Slf4j
 public class ClassScanner {
 
-    public static List<Class<?>> classes = new ArrayList<>();
+    private static final List<Class<?>> CLASSES = new ArrayList<>();
+
+    public static List<Class<?>> getClasses(){
+        return CLASSES;
+    }
 
     /**
      * 扫描当前项目的所有class
@@ -29,6 +33,7 @@ public class ClassScanner {
         File file;
         log.debug("类扫描的路径为:" + resource);
         try {
+            assert resource != null;
             file = new File(resource.toURI());
         } catch (URISyntaxException e) {
             log.error(e.getMessage(), e);
@@ -63,7 +68,7 @@ public class ClassScanner {
                 try {
                     String absolutePath = file1.getAbsolutePath().replace(String.valueOf(File.separatorChar), ".");
                     String absoluteClassName = absolutePath.substring(absolutePath.indexOf("classes.") + 8, absolutePath.lastIndexOf(".class"));
-                    classes.add(Class.forName(absoluteClassName));
+                    CLASSES.add(Class.forName(absoluteClassName));
                 } catch (ClassNotFoundException e) {
                     log.warn(e.getMessage(), e);
                 }

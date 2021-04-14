@@ -55,7 +55,7 @@ public class BeanDefinition {
         methodDefinitionMap = new ConcurrentHashMap<>();
     }
 
-    public Object getOriginalBean() {
+    public Object getFinalTargetBean() {
         return aop == null ? bean : aop;
     }
 
@@ -65,7 +65,7 @@ public class BeanDefinition {
      * @param clazz 字节码
      * @return BeanDefinition
      */
-    public static BeanDefinition parse(Class<?> clazz) {
+    public static BeanDefinition parse(Class<?> clazz, BeanTypeEnum beanType) {
         BeanDefinition beanDefinition = new BeanDefinition();
 
         char[] chars = clazz.getSimpleName().toCharArray();
@@ -76,17 +76,18 @@ public class BeanDefinition {
             List<Annotation> annotations = Arrays.asList(clazz.getAnnotations());
             boolean match = annotations.stream().anyMatch(annotation -> annotation instanceof MyTransactional);
             Object bean = clazz.newInstance();
+            beanDefinition.setBean(bean);
             if (match) {
                 // 创建代理对象
                 Object aopProxyBean = AopProxyFactory.createAopProxy(bean);
                 beanDefinition.setAop(aopProxyBean);
             }
-            beanDefinition.setBean(bean);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
         beanDefinition.setMethodDefinitionMap(invokeMethodDefinition(clazz));
+        beanDefinition.setBeanType(beanType);
         return beanDefinition;
     }
 

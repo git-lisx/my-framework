@@ -62,7 +62,7 @@ public class BeanFactory {
         Set<String> beanIds = beanFactory.getAllBeanIds();
         for (String beanId : beanIds) {
             BeanDefinition beanDefinition = BeanFactory.getInstance().getBeanDefinition(beanId);
-            Object bean = beanDefinition.getOriginalBean();
+            Object bean = beanDefinition.getFinalTargetBean();
             Field[] fields = bean.getClass().getDeclaredFields();
             for (Field field : fields) {
                 Annotation[] annotations = field.getAnnotations();
@@ -73,9 +73,9 @@ public class BeanFactory {
                         field.setAccessible(true);
                         try {
                             // 依赖注入
-                            Object originalBean = fieldBeanDefinition.getOriginalBean();
+                            Object originalBean = fieldBeanDefinition.getFinalTargetBean();
                             field.set(bean, originalBean);
-                        } catch (IllegalAccessException e) {
+                        } catch (IllegalAccessException | IllegalArgumentException e) {
                             log.warn(e.getMessage(), e);
                         }
                     }
@@ -90,7 +90,7 @@ public class BeanFactory {
      * 只有指定注解的类才会由容器托管
      */
     public void ioc() {
-        List<Class<?>> classes = ClassScanner.classes;
+        List<Class<?>> classes = ClassScanner.getClasses();
         for (Class<?> clazz : classes) {
             Annotation[] annotations = clazz.getAnnotations();
             for (Annotation annotation : annotations) {
@@ -115,9 +115,8 @@ public class BeanFactory {
      */
     private void initBeanDefinitionAndAddFactory(Class<?> clazz, BeanTypeEnum beanType) {
         // 将class解析成beanDefinition
-        BeanDefinition beanDefinition = BeanDefinition.parse(clazz);
+        BeanDefinition beanDefinition = BeanDefinition.parse(clazz, beanType);
         if (beanDefinition != null) {
-            beanDefinition.setBeanType(beanType);
             boolean containsKey = beanDefinitionMap.containsKey(beanDefinition.getName());
             if (containsKey) {
                 throw new RuntimeException("beanId重复了，beanId：" + beanDefinition.getName());
