@@ -18,6 +18,14 @@
             <artifactId>spring-framework</artifactId>
             <version>1.0</version>
         </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>8.5.100</version>
+        </dependency>
+
     </dependencies>
 
 </project>

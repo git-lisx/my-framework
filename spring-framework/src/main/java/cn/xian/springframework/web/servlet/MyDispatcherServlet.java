@@ -1,9 +1,7 @@
 package cn.xian.springframework.web.servlet;
 
 import cn.xian.springframework.HandlerMapping;
-import cn.xian.springframework.beans.factory.BeanFactory;
 import cn.xian.springframework.beans.factory.UriFactory;
-import cn.xian.springframework.beans.factory.classloader.ClassScanner;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,14 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
+import static cn.xian.springframework.web.constant.WebConstant.APPLICATION_JSON_UTF_8;
 import static cn.xian.springframework.web.constant.WebConstant.TEXT_HTML_UTF_8;
 
-/**
- * @author lishixian
- * @date 2019/10/15 下午8:39
- */
 @Slf4j
 public class MyDispatcherServlet extends HttpServlet {
 
@@ -38,20 +35,30 @@ public class MyDispatcherServlet extends HttpServlet {
     private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
         response.setContentType(TEXT_HTML_UTF_8);
+//        response.setContentType(APPLICATION_JSON_UTF_8);
+
         String uri = request.getRequestURI();
-        //根据uri找到对应的方法执行
+        log.debug("Received request for URI: {}", uri);
+
+        // 根据 URI 查找对应的方法执行
         Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
+            log.warn("No handler found for URI: {}", uri);
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "该资源未找到");
             return;
         }
+
+        // 执行处理并返回结果
         Optional<String> resultOptional = HandlerMapping.execute(uriMethodRelateOptional.get(), request.getParameterMap());
         if (resultOptional.isPresent()) {
             String result = resultOptional.get();
             try (ServletOutputStream outputStream = response.getOutputStream()) {
-                outputStream.write(result.getBytes());
+                outputStream.write(result.getBytes(StandardCharsets.UTF_8));
                 outputStream.flush();
             }
+        } else {
+            log.warn("Handler executed but returned no content for URI: {}", uri);
+            response.sendError(HttpServletResponse.SC_NO_CONTENT, "没有内容");
         }
     }
 }

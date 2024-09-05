@@ -7,7 +7,6 @@ import cn.xian.springframework.web.bind.annotation.MyRequestMapping;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -86,7 +85,7 @@ public class UriFactory {
                 for (Annotation methodAnnotation : methodAnnotations) {
                     if (methodAnnotation instanceof MyRequestMapping) {
                         String methodUri = ((MyRequestMapping) methodAnnotation).value();
-                        String uri = Paths.get(uriStringBuilder.toString(), methodUri).toString();
+                        String uri = (uriStringBuilder.toString() +'/'+ methodUri).replaceAll("//+", "/");
                         //暂不考虑重载的情况
                         UriMethodRelation uriMethodRelation = new UriMethodRelation(uri, beanId, method.getName());
                         boolean containsKey = uriMethodRelationMap.containsKey(uri);
