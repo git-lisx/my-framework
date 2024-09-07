@@ -26,6 +26,12 @@
             <version>8.5.100</version>
         </dependency>
 
+        <dependency>
+            <groupId>cn.xian</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

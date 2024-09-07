@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 // 修改 HttpRequestHandler 处理方式
-class HttpRequestHandler implements Runnable {
+public class HttpRequestHandler implements Runnable {
     private Socket clientSocket;
 
     public HttpRequestHandler(Socket clientSocket) {
