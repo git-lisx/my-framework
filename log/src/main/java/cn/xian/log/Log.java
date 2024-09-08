@@ -19,7 +19,7 @@ public class Log {
     }
 
     public static void error(String content, Object object) {
-        String log = String.format(content, object);
+        String log = getLog(content, object);
         print(log, "ERROR", true);
     }
 
@@ -37,8 +37,12 @@ public class Log {
     }
 
     public static void warn(String content, Object object) {
-        String log = String.format(content, object);
+        String log = getLog(content, object);
         print(log, "WARN", false);
+    }
+
+    private static String getLog(String content, Object object) {
+        return String.format(content.replaceAll("\\{}","%s"), object);
     }
 
     public static void debug(String content) {
@@ -51,7 +55,7 @@ public class Log {
     }
 
     public static void debug(String content, Object object) {
-        String log = String.format(content, object);
+        String log = getLog(content, object);
         print(log, "DEBUG", false);
     }
 

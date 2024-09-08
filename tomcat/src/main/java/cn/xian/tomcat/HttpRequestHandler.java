@@ -2,11 +2,12 @@ package cn.xian.tomcat;
 
 import cn.xian.servlet.http.HttpServletRequest;
 import cn.xian.servlet.http.HttpServletResponse;
+import cn.xian.servlet.http.HttpSession;
 import cn.xian.servlet.http.MyHttpServlet;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,7 @@ public class HttpRequestHandler implements Runnable {
     private Socket clientSocket;
 
     private Map<String, MyHttpServlet> servletMap;
+//    private final Map<String, HttpSession> sessionMap = new HashMap<>();
 
     public HttpRequestHandler() {
     }
@@ -32,39 +34,20 @@ public class HttpRequestHandler implements Runnable {
         this.clientSocket = clientSocket;
     }
 
-//    public Map<String, MyHttpServlet> getServletMap() {
-//        return servletMap;
-//    }
 
     @Override
     public void run() {
         try (InputStream inputStream = clientSocket.getInputStream();
              OutputStream outputStream = clientSocket.getOutputStream()) {
-
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String requestLine = reader.readLine();
-            if (requestLine == null) {
-                // 为啥会出现这个情况？
-                System.out.println("出现null");
+            HttpServletRequest request = new HttpServletRequest(reader);
+            if (!request.isLegal()){
                 return;
             }
-            String[] requestParts = requestLine.split(" ");
-            String method = requestParts[0];
-            String path = requestParts[1];
-            String[] paths = path.split("\\?");
-            String uri = paths[0];
-            HttpServletRequest request = new HttpServletRequest(reader, uri);
-            HttpServletResponse response = new HttpServletResponse(outputStream);
-            // 处理参数
-            if (paths.length > 1) {
-                String[] params = paths[1].split("&");
-                for (String param : params) {
-                   String[] keyValue = param.split("=");
-                   String key = keyValue[0];
-                   String value = keyValue[1];
-                   request.addParameter(key, value);
-               }
-            }
+            HttpSession session = request.getSession();
+            String uri = request.getRequestURI();
+            String method = request.getMethod();
+            HttpServletResponse response = new HttpServletResponse(outputStream,session);
             for (String key : servletMap.keySet()) {
                 // 匹配前端控制器
                 Matcher matcher = Pattern.compile(key).matcher(uri);
@@ -74,7 +57,7 @@ public class HttpRequestHandler implements Runnable {
                         myHttpServlet.doGet(request, response);
                     } else if (method.equals("POST")) {
                         myHttpServlet.doPost(request, response);
-                    }else {
+                    } else {
                         response.sendError(405, "该请求类型暂不支持");
                     }
                     return;
@@ -83,6 +66,26 @@ public class HttpRequestHandler implements Runnable {
             response.sendError(404, "该资源未找到");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
+
+//    // 解析Cookie字符串，返回SessionID
+//    private static String getSessionIdFromCookies(String cookies) {
+//        if (cookies != null) {
+//            String[] cookieArray = cookies.split(";");
+//            for (String cookie : cookieArray) {
+//                String[] keyValue = cookie.split("=");
+//                if (keyValue.length == 2 && keyValue[0].trim().equals("JSESSIONID")) {
+//                    return keyValue[1].trim();
+//                }
+//            }
+//        }
+//        return null;
+//    }
 }

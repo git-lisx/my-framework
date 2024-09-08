@@ -9,9 +9,11 @@ public class HttpServletResponse {
     private final OutputStream outputStream;
     private int statusCode = 200;
     private String body = "";
+    private final HttpSession session;
 
-    public HttpServletResponse(OutputStream outputStream) {
+    public HttpServletResponse(OutputStream outputStream, HttpSession session) {
         this.outputStream = outputStream;
+        this.session = session;
     }
 
     public void setStatusCode(int statusCode) {
@@ -28,6 +30,9 @@ public class HttpServletResponse {
         writer.println("Content-Type: text/html; charset=UTF-8");
 //        writer.println("Content-Type: application/json; charset=UTF-8");
         writer.println("Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length);
+        String sessionId= session.getSessionId();
+        writer.println("Set-Cookie: JSESSIONID=" + sessionId);
+
         writer.println();
         writer.println(body);
         writer.flush();

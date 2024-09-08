@@ -33,9 +33,6 @@ public class MyTomcat {
                 Socket clientSocket = serverSocket.accept();
                 // 启动一个新线程处理请求
                 new Thread(new HttpRequestHandler(clientSocket,servletMap)).start();
-//                httpRequestHandler.setClientSocket(clientSocket);
-//                new Thread(httpRequestHandler).start();
-                System.out.println("处理完成一个请求");
             }
         }
     }
