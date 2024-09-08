@@ -1,6 +1,7 @@
 package cn.xian.springframework.beans.factory.classloader;
 
-import lombok.extern.slf4j.Slf4j;
+
+import cn.xian.log.Log;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -16,7 +17,6 @@ import java.util.Queue;
  * @author lishixian
  * @date 2019/10/16 上午10:34
  */
-@Slf4j
 public class ClassScanner {
 
     private static final List<Class<?>> CLASSES = new ArrayList<>();
@@ -31,15 +31,15 @@ public class ClassScanner {
     public static void scan() {
         URL resource = ClassScanner.class.getResource("/");
         File file;
-        log.debug("类扫描的路径为:" + resource);
+        Log.debug("类扫描的路径为:" + resource);
         try {
             assert resource != null;
             file = new File(resource.toURI());
         } catch (URISyntaxException e) {
-            log.error(e.getMessage(), e);
+            Log.error(e.getMessage(), e);
             return;
         }
-        log.debug("类扫描的路径为:" + file);
+        Log.debug("类扫描的路径为:" + file);
         //使用队列来实现广度遍历,找出.class文件
         Queue<File> queue = new LinkedList<>();
         scanDirectoryAndInvokeClass(file, queue);
@@ -47,7 +47,7 @@ public class ClassScanner {
             File pollFile = queue.poll();
             scanDirectoryAndInvokeClass(pollFile, queue);
         }
-        log.debug(resource + "的class扫描完毕!");
+        Log.debug(resource + "的class扫描完毕!");
 
     }
 
@@ -70,7 +70,7 @@ public class ClassScanner {
                     String absoluteClassName = absolutePath.substring(absolutePath.indexOf("classes.") + 8, absolutePath.lastIndexOf(".class"));
                     CLASSES.add(Class.forName(absoluteClassName));
                 } catch (ClassNotFoundException e) {
-                    log.warn(e.getMessage(), e);
+                    Log.warn(e.getMessage(), e);
                 }
             }
         }

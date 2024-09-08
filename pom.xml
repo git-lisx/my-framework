@@ -12,6 +12,9 @@
         <module>spring-framework</module>
         <module>tomcat</module>
         <module>spring-boot-starter-web</module>
+        <module>servlet-api</module>
+        <module>web-app-springboot</module>
+        <module>log</module>
     </modules>
     <packaging>pom</packaging>
 

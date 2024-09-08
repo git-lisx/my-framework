@@ -1,15 +1,16 @@
-package cn.xian.tomcat;
+package cn.xian.servlet.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
-class HttpResponse {
-    private OutputStream outputStream;
+public class HttpServletResponse {
+    private final OutputStream outputStream;
     private int statusCode = 200;
     private String body = "";
 
-    public HttpResponse(OutputStream outputStream) {
+    public HttpServletResponse(OutputStream outputStream) {
         this.outputStream = outputStream;
     }
 
@@ -25,7 +26,8 @@ class HttpResponse {
         PrintWriter writer = new PrintWriter(outputStream);
         writer.println("HTTP/1.1 " + statusCode + " " + getReasonPhrase(statusCode));
         writer.println("Content-Type: text/html; charset=UTF-8");
-        writer.println("Content-Length: " + body.length());
+//        writer.println("Content-Type: application/json; charset=UTF-8");
+        writer.println("Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length);
         writer.println();
         writer.println(body);
         writer.flush();
@@ -41,4 +43,11 @@ class HttpResponse {
                 return "";
         }
     }
+
+    public void sendError(int statusCode,String body) throws IOException {
+        this.statusCode = statusCode;
+        this.body = body;
+        this.send();
+    }
+
 }

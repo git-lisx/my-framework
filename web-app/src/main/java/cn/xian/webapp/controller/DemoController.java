@@ -32,8 +32,9 @@ public class DemoController {
     public String mvc(String name) {
 
         String result = demoServiceImpl.getInfo(name);
-
-        return "接收到的参数：" + result;
+        String s= "接收到的参数：" + result;
+        System.out.println(s);
+        return s;
     }
 
     @MyRequestMapping("/cglib/transaction")

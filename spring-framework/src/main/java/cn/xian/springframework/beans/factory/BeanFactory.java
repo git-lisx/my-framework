@@ -1,5 +1,6 @@
 package cn.xian.springframework.beans.factory;
 
+import cn.xian.log.Log;
 import cn.xian.springframework.beans.factory.annotation.MyAutowired;
 import cn.xian.springframework.beans.factory.classloader.ClassScanner;
 import cn.xian.springframework.beans.factory.config.BeanDefinition;
@@ -8,7 +9,6 @@ import cn.xian.springframework.stereotype.MyComponent;
 import cn.xian.springframework.stereotype.MyController;
 import cn.xian.springframework.stereotype.MyRepository;
 import cn.xian.springframework.stereotype.MyService;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author lishixian
  * @date 2019/10/15 下午7:45
  */
-@Slf4j
 public class BeanFactory {
 
     /**
@@ -76,7 +75,7 @@ public class BeanFactory {
                             Object originalBean = fieldBeanDefinition.getFinalTargetBean();
                             field.set(bean, originalBean);
                         } catch (IllegalAccessException | IllegalArgumentException e) {
-                            log.warn(e.getMessage(), e);
+                            Log.warn(e.getMessage(), e);
                         }
                     }
                 }

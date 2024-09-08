@@ -1,6 +1,6 @@
 package cn.xian.springframework.thread.pool;
 
-import lombok.extern.slf4j.Slf4j;
+import cn.xian.log.Log;
 
 import java.util.concurrent.*;
 
@@ -8,7 +8,6 @@ import java.util.concurrent.*;
  * @author lishixian
  * @date 2020/7/27 下午1:59
  */
-@Slf4j
 public class MyDefaultThreadPool {
 
     public static void main(String[] args) {
@@ -22,11 +21,11 @@ public class MyDefaultThreadPool {
 
 
         executorService.submit(() -> {
-            log.info("哈哈哈");
+            Log.info("哈哈哈");
         });
 
         executorService.submit(() -> {
-            log.info("哈哈哈2");
+            Log.info("哈哈哈2");
         });
 
 

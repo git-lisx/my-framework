@@ -13,22 +13,21 @@
     <packaging>war</packaging>
 
     <dependencies>
+        <!--SpringMVC基于servlet技术开发的，由于使用的JavaSE的JDK，需引入servlet包-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+        <!-- 引入lombok，使用@Data可以省略set get方法 @Slf4j直接使用log打印日志 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.20</version>
+        </dependency>
         <dependency>
             <groupId>cn.xian</groupId>
             <artifactId>spring-framework</artifactId>
-            <version>1.0</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>8.5.100</version>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.xian</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
             <version>1.0</version>
         </dependency>
 

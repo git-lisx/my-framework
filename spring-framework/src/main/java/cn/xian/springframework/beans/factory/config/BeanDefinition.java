@@ -2,7 +2,6 @@ package cn.xian.springframework.beans.factory.config;
 
 import cn.xian.springframework.aop.proxy.AopProxyFactory;
 import cn.xian.springframework.transaction.annotation.MyTransactional;
-import lombok.Data;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
  * @author lishixian
  * @date 2019/10/15 下午7:58
  */
-@Data
 public class BeanDefinition {
 
     /**
@@ -128,4 +126,51 @@ public class BeanDefinition {
     }
 
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public BeanTypeEnum getBeanType() {
+        return beanType;
+    }
+
+    public void setBeanType(BeanTypeEnum beanType) {
+        this.beanType = beanType;
+    }
+
+    public Object getAop() {
+        return aop;
+    }
+
+    public void setAop(Object aop) {
+        this.aop = aop;
+    }
+
+    public Object getBean() {
+        return bean;
+    }
+
+    public void setBean(Object bean) {
+        this.bean = bean;
+    }
+
+    public Map<String, MethodDefinition> getMethodDefinitionMap() {
+        return methodDefinitionMap;
+    }
+
+    public void setMethodDefinitionMap(Map<String, MethodDefinition> methodDefinitionMap) {
+        this.methodDefinitionMap = methodDefinitionMap;
+    }
 }

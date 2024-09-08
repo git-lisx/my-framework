@@ -5,7 +5,7 @@ import java.io.IOException;
 public class SimpleTomcatTest {
 
     public static void main(String[] args) throws IOException {
-        SimpleTomcat tomcat = new SimpleTomcat(8080);
+        MyTomcat tomcat = new MyTomcat(8080);
         tomcat.start();
     }
 }
