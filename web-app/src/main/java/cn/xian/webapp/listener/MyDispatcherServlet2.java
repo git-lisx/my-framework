@@ -1,5 +1,6 @@
 package cn.xian.webapp.listener;
 
+import cn.xian.log.Log;
 import cn.xian.springframework.HandlerMapping;
 import cn.xian.springframework.beans.factory.UriFactory;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
@@ -38,12 +39,12 @@ public class MyDispatcherServlet2 extends HttpServlet {
 //        response.setContentType(APPLICATION_JSON_UTF_8);
 
         String uri = request.getRequestURI();
-        log.debug("Received request for URI: {}", uri);
+        Log.debug("Received request for URI: {}", uri);
 
         // 根据 URI 查找对应的方法执行
         Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
-            log.warn("No handler found for URI: {}", uri);
+            Log.warn("No handler found for URI: {}", uri);
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "该资源未找到");
             return;
         }
@@ -57,7 +58,7 @@ public class MyDispatcherServlet2 extends HttpServlet {
                 outputStream.flush();
             }
         } else {
-            log.warn("Handler executed but returned no content for URI: {}", uri);
+            Log.warn("Handler executed but returned no content for URI: {}", uri);
             response.sendError(HttpServletResponse.SC_NO_CONTENT, "没有内容");
         }
     }
