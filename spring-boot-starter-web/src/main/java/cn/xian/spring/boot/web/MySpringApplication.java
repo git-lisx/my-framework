@@ -10,12 +10,6 @@ import java.util.Map;
 
 public class MySpringApplication {
 
-
-    public static void main(String[] args) {
-        getServerPort();
-    }
-
-
     public static void run(Class<?> clazz, String[] args) {
         ApplicationContext.init();
         Integer port = getServerPort();

@@ -1,5 +1,6 @@
 package cn.xian.tomcat;
 
+import cn.xian.log.Log;
 import cn.xian.servlet.http.HttpServletRequest;
 import cn.xian.servlet.http.HttpServletResponse;
 import cn.xian.servlet.http.HttpSession;
@@ -8,30 +9,20 @@ import cn.xian.servlet.http.MyHttpServlet;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // 修改 HttpRequestHandler 处理方式
 public class HttpRequestHandler implements Runnable {
-    private Socket clientSocket;
+    private final Socket clientSocket;
 
-    private Map<String, MyHttpServlet> servletMap;
-//    private final Map<String, HttpSession> sessionMap = new HashMap<>();
+    private final Map<String, MyHttpServlet> servletMap;
 
-    public HttpRequestHandler() {
-    }
-
-    public HttpRequestHandler(Socket clientSocket) {
-        this.clientSocket = clientSocket;
-    }
 
     public HttpRequestHandler(Socket clientSocket, Map<String, MyHttpServlet> servletMap) {
         this.clientSocket = clientSocket;
         this.servletMap = servletMap;
-    }
-
-    public void setClientSocket(Socket clientSocket) {
-        this.clientSocket = clientSocket;
     }
 
 
@@ -41,29 +32,12 @@ public class HttpRequestHandler implements Runnable {
              OutputStream outputStream = clientSocket.getOutputStream()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             HttpServletRequest request = new HttpServletRequest(reader);
-            if (!request.isLegal()){
+            if (!request.isLegal()) {
                 return;
             }
             HttpSession session = request.getSession();
-            String uri = request.getRequestURI();
-            String method = request.getMethod();
-            HttpServletResponse response = new HttpServletResponse(outputStream,session);
-            for (String key : servletMap.keySet()) {
-                // 匹配前端控制器
-                Matcher matcher = Pattern.compile(key).matcher(uri);
-                if (matcher.find()) {
-                    MyHttpServlet myHttpServlet = servletMap.get(key);
-                    if (method.equals("GET")) {
-                        myHttpServlet.doGet(request, response);
-                    } else if (method.equals("POST")) {
-                        myHttpServlet.doPost(request, response);
-                    } else {
-                        response.sendError(405, "该请求类型暂不支持");
-                    }
-                    return;
-                }
-            }
-            response.sendError(404, "该资源未找到");
+            HttpServletResponse response = new HttpServletResponse(outputStream, session);
+            service(request, response);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -75,17 +49,35 @@ public class HttpRequestHandler implements Runnable {
         }
     }
 
-//    // 解析Cookie字符串，返回SessionID
-//    private static String getSessionIdFromCookies(String cookies) {
-//        if (cookies != null) {
-//            String[] cookieArray = cookies.split(";");
-//            for (String cookie : cookieArray) {
-//                String[] keyValue = cookie.split("=");
-//                if (keyValue.length == 2 && keyValue[0].trim().equals("JSESSIONID")) {
-//                    return keyValue[1].trim();
-//                }
-//            }
-//        }
-//        return null;
-//    }
+    private void service(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Log.info("线程：" + Thread.currentThread().getName() + "开始处理请求");
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        Log.info("线程：" + Thread.currentThread().getName() + "睡了2秒，现在起来干活啦");
+
+
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        for (String key : servletMap.keySet()) {
+            // 匹配前端控制器
+            Matcher matcher = Pattern.compile(key).matcher(uri);
+            if (matcher.find()) {
+                MyHttpServlet myHttpServlet = servletMap.get(key);
+                if (method.equals("GET")) {
+                    myHttpServlet.doGet(request, response);
+                } else if (method.equals("POST")) {
+                    myHttpServlet.doPost(request, response);
+                } else {
+                    response.sendError(405, "该请求类型暂不支持");
+                }
+                return;
+            }
+        }
+        response.sendError(404, "该资源未找到");
+    }
+
+
 }

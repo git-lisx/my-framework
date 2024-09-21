@@ -1,2 +1,6 @@
 server:
-  port: 8082
+  port: 8083
+
+  servlet:
+    session:
+      timeout: 60 # 单位秒

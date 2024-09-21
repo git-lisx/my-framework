@@ -1,4 +1,4 @@
-# Spring框架
+# Spring等框架集合
 
 项目只需依赖jdk环境即可，无需第三方依赖
 
@@ -19,18 +19,26 @@
 
 - IOC和DI
 - AOP
-  - 模拟实现事务 
-  - 动态代理
-    - 基于接口实现，实现jdk动态代理
-    - 基于子类实现（由于需要引入第三方依赖，因此，已注释掉），移除cglib（该项目作者已不维护，Spring5之后也修改为基于bytebuddy实现）使用基于bytebuddy实现
+    - 模拟实现事务
+    - 动态代理
+        - 基于接口实现，实现jdk动态代理
+        - 基于子类实现（由于需要引入第三方依赖，因此，已注释掉），移除cglib（该项目作者已不维护，Spring5之后也修改为基于bytebuddy实现）使用基于bytebuddy实现
 - MVC
 
 ### tomcat
 
-使用socket技术实现，遵循http超文本协议规范，引入自己定义的servlet-api
+使用socket技术实现，遵循http超文本协议规范，引入自己定义的servlet-api，实现了
+
+- 接收http请求
+- session会话
+- 多servlet容器支持
+- IO多路复用（后续计划实现）
 
 ### spring-boot-starter-web
-内置自己编写的tomcat实现
+
+已实现的功能：
+- 无需外部服务器（例如：Tomcat），使用内置自己编写的tomcat实现
+- 配置文件支持（application.yaml）
 
 ## 启动
 
