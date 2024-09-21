@@ -1,6 +1,8 @@
 server:
   port: 8083
-
   servlet:
     session:
-      timeout: 60 # 单位秒
+      timeout: 30 # 会话超时，单位为分钟
+    async:
+      # 请求处理超时，单位为秒
+      timeout: 5

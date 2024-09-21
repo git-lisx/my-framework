@@ -6,16 +6,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
-public class HttpServletRequest {
+public class MyHttpServletRequest {
     private final BufferedReader reader;
     private String uri;
     private String method;
-    private HttpSession session;
+    private MyHttpSession session;
     private final Map<String, String[]> parameterMap = new HashMap<>();
 
     private boolean legal = true;
 
-    public HttpServletRequest(BufferedReader reader) throws IOException {
+    public MyHttpServletRequest(BufferedReader reader) throws IOException {
         this.reader = reader;
 //        this.uri = uri;
         init();
@@ -39,7 +39,6 @@ public class HttpServletRequest {
             return;
         }
         // 读取并解析请求头
-//            String header;
         String cookies = null;
         for (String header : lines) {
             if (header.startsWith("Cookie:")) {
@@ -48,7 +47,7 @@ public class HttpServletRequest {
         }
         // 解析Cookie，查找JSESSIONID
         String sessionId = getSessionIdFromCookies(cookies);
-        this.session = SessionHandler.getSession(sessionId);
+        this.session = MySessionHandler.getSession(sessionId);
 
         String[] requestParts = lines.get(0).split(" ");
         this.method = requestParts[0];
@@ -75,7 +74,7 @@ public class HttpServletRequest {
         return method;
     }
 
-    public HttpSession getSession() {
+    public MyHttpSession getSession() {
         return session;
     }
 

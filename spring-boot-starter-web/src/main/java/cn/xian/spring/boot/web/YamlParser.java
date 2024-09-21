@@ -1,71 +1,101 @@
 package cn.xian.spring.boot.web;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import cn.xian.log.Log;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class YamlParser {
 
-    // 解析 YAML 文件
-    public static Map<String, Object> parseYaml(InputStream inputStream) throws IOException {
-        Map<String, Object> yamlMap = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+
+    private final Map<String, String> configMap = new HashMap<>();
+
+    // 读取 YAML 文件并解析
+    public void loadConfig() {
+        try (InputStream inputStream = YamlParser.class.getClassLoader().getResourceAsStream("application.yaml");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
             String line;
-            String currentSection = null;  // 用于保存当前的 section (如 server, database)
+            String currentPrefix = "";
+            int lastIndentLevel = 0;
 
             while ((line = reader.readLine()) != null) {
-                line = line.trim();
+                // 过滤注释
+                line = line.split("#")[0];
 
-                // 忽略空行或注释
-                if (line.isEmpty() || line.startsWith("#")) {
+                // 跳过空行
+                if (line.isEmpty()) {
                     continue;
                 }
 
-                // 处理 section (例如：server:)
-                if (line.endsWith(":") && !line.startsWith(" ")) {
-                    currentSection = line.substring(0, line.length() - 1);
-                    yamlMap.put(currentSection, new HashMap<String, Object>());
-                } else if (currentSection != null && line.contains(":")) {
-                    // 处理键值对 (例如：port: 8080)
+                // 计算当前行的缩进
+                int indentLevel = getIndentLevel(line);
+
+                // 移除缩进后的行
+                line = line.trim();
+
+                // 处理键值对
+                if (line.contains(":")) {
                     String[] parts = line.split(":", 2);
                     String key = parts[0].trim();
                     String value = parts[1].trim();
 
-                    // 将键值对放入当前 section 的 map 中
-                    Map<String, Object> sectionMap = (Map<String, Object>) yamlMap.get(currentSection);
-                    sectionMap.put(key, parseValue(value));
+                    // 处理嵌套结构
+                    if (value.isEmpty()) {
+                        currentPrefix = updatePrefix(currentPrefix, key, indentLevel, lastIndentLevel);
+                        lastIndentLevel = indentLevel;
+                    } else {
+                        // 构建完整键名，并存储值
+                        String fullKey = currentPrefix + key;
+                        configMap.put(fullKey, value.replace("#", "").trim());
+                    }
                 }
             }
+        } catch (IOException e) {
+            Log.warn("读取配置文件失败", e);
         }
-        return yamlMap;
     }
 
-    // 解析值，将字符串值转换为适当的类型
-    private static Object parseValue(String value) {
-        if (value.matches("\\d+")) {
-            return Integer.parseInt(value);  // 解析整数
-        } else if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(value);  // 解析布尔值
-        }
-        return value;  // 默认返回字符串
-    }
-    // 新增方法：通过路径获取配置值
-    public static Object getConfigValue(Map<String, Object> config, String path) {
-        String[] keys = path.split("\\.");
-        Object value = config;
-
-        for (String key : keys) {
-            if (value instanceof Map) {
-                value = ((Map<?, ?>) value).get(key);
+    // 获取缩进层次
+    private int getIndentLevel(String line) {
+        int indentLevel = 0;
+        for (char c : line.toCharArray()) {
+            if (c == ' ') {
+                indentLevel++;
             } else {
-                return null; // 路径错误时返回 null
+                break;
+            }
+        }
+        return indentLevel / 2; // 假设每级缩进是2个空格
+    }
+
+    // 更新键前缀
+    private String updatePrefix(String currentPrefix, String key, int indentLevel, int lastIndentLevel) {
+        String[] parts = currentPrefix.split("\\.");
+        StringBuilder newPrefix = new StringBuilder();
+
+        // 如果缩进级别减少了，修正当前前缀
+        for (int i = 0; i < indentLevel; i++) {
+            if (i < parts.length) {
+                newPrefix.append(parts[i]).append(".");
             }
         }
 
-        return value;
+        // 添加当前键
+        newPrefix.append(key).append(".");
+        return newPrefix.toString();
+    }
+
+    // 根据键名获取配置值
+    public String getConfig(String key) {
+        if (configMap.containsKey(key)) {
+            String value = configMap.get(key);
+            Log.info("获取配置值：" + key + "=" + value);
+            return value;
+        } else {
+            Log.error("配置不存在: " + key);
+            throw new RuntimeException("配置不存在: " + key);
+        }
     }
 
 }

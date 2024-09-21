@@ -2,14 +2,21 @@ package cn.xian.servlet.http;
 
 import java.util.Map;
 
-public class HttpSession {
+public class MyHttpSession {
     private String sessionId;
+
+    private long lastAccessTime;
 
     private Map<String, Object> attributes;
 
-    public HttpSession(String sessionId, Map<String, Object> attributes) {
+    public MyHttpSession(String sessionId, Map<String, Object> attributes) {
         this.sessionId = sessionId;
         this.attributes = attributes;
+        this.lastAccessTime = System.currentTimeMillis();
+    }
+
+    public void refreshLastAccessTime() {
+        this.lastAccessTime = System.currentTimeMillis();
     }
 
     public String getSessionId() {
@@ -26,5 +33,13 @@ public class HttpSession {
 
     public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
+    }
+
+    public long getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    public void setLastAccessTime(long lastAccessTime) {
+        this.lastAccessTime = lastAccessTime;
     }
 }

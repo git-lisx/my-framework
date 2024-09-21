@@ -1,8 +1,8 @@
 package cn.xian.springframework.web.servlet;
 
 import cn.xian.log.Log;
-import cn.xian.servlet.http.HttpServletRequest;
-import cn.xian.servlet.http.HttpServletResponse;
+import cn.xian.servlet.http.MyHttpServletRequest;
+import cn.xian.servlet.http.MyHttpServletResponse;
 import cn.xian.servlet.http.MyHttpServlet;
 import cn.xian.springframework.HandlerMapping;
 import cn.xian.springframework.beans.factory.UriFactory;
@@ -16,19 +16,19 @@ import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 import java.io.IOException;
 import java.util.Optional;
 
-public class MyDispatcherServlet implements MyHttpServlet {
+public class MyDispatcherServlet extends MyHttpServlet {
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(MyHttpServletRequest request, MyHttpServletResponse response) throws IOException {
         doPost(request, response);
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException {
+    public void doPost(MyHttpServletRequest request, MyHttpServletResponse response)throws IOException {
         doDispatch(request, response);
     }
 
-    private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void doDispatch(MyHttpServletRequest request, MyHttpServletResponse response) throws IOException {
 //        response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
 //        response.setContentType(TEXT_HTML_UTF_8);
 //        response.setContentType(APPLICATION_JSON_UTF_8);
@@ -40,7 +40,7 @@ public class MyDispatcherServlet implements MyHttpServlet {
         Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
             Log.warn("No handler found for URI: {}", uri);
-            response.sendError(404, "该资源未找到");
+            response.send(404, "该资源未找到");
             return;
         }
 
@@ -56,7 +56,7 @@ public class MyDispatcherServlet implements MyHttpServlet {
 //            }
         } else {
             Log.warn("Handler executed but returned no content for URI: {}", uri);
-            response.sendError(404, "没有内容");
+            response.send(404, "没有内容");
         }
     }
 }

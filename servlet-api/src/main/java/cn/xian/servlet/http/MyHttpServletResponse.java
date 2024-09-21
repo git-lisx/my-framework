@@ -5,13 +5,13 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-public class HttpServletResponse {
+public class MyHttpServletResponse {
     private final OutputStream outputStream;
     private int statusCode = 200;
     private String body = "";
-    private final HttpSession session;
+    private final MyHttpSession session;
 
-    public HttpServletResponse(OutputStream outputStream, HttpSession session) {
+    public MyHttpServletResponse(OutputStream outputStream, MyHttpSession session) {
         this.outputStream = outputStream;
         this.session = session;
     }
@@ -30,7 +30,7 @@ public class HttpServletResponse {
         writer.println("Content-Type: text/html; charset=UTF-8");
 //        writer.println("Content-Type: application/json; charset=UTF-8");
         writer.println("Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length);
-        String sessionId= session.getSessionId();
+        String sessionId = session.getSessionId();
         writer.println("Set-Cookie: JSESSIONID=" + sessionId);
 
         writer.println();
@@ -49,7 +49,7 @@ public class HttpServletResponse {
         }
     }
 
-    public void sendError(int statusCode,String body) throws IOException {
+    public void send(int statusCode, String body) throws IOException {
         this.statusCode = statusCode;
         this.body = body;
         this.send();

@@ -29,14 +29,17 @@
 
 使用socket技术实现，遵循http超文本协议规范，引入自己定义的servlet-api，实现了
 
-- 接收http请求
+- 处理http请求
 - session会话
+- session过期清理（懒惰清理+定期清理策略，提升性能和降低内存压力，待实现）
 - 多servlet容器支持
+- 超时设置
 - IO多路复用（后续计划实现）
 
 ### spring-boot-starter-web
 
 已实现的功能：
+
 - 无需外部服务器（例如：Tomcat），使用内置自己编写的tomcat实现
 - 配置文件支持（application.yaml）
 
