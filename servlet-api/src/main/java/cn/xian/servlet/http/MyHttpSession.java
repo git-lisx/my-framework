@@ -1,45 +1,70 @@
 package cn.xian.servlet.http;
 
-import java.util.Map;
+public interface MyHttpSession {
 
-public class MyHttpSession {
-    private String sessionId;
 
-    private long lastAccessTime;
+    /**
+     * 获取会话ID
+     *
+     * @return 会话ID
+     */
+    String getId();
 
-    private Map<String, Object> attributes;
+    /**
+     * 设置属性
+     *
+     * @param name  属性名
+     * @param value 属性值
+     */
+    void setAttribute(String name, Object value);
 
-    public MyHttpSession(String sessionId, Map<String, Object> attributes) {
-        this.sessionId = sessionId;
-        this.attributes = attributes;
-        this.lastAccessTime = System.currentTimeMillis();
-    }
+    /**
+     * 获取属性
+     *
+     * @param name 属性名
+     * @return 属性值
+     */
+    Object getAttribute(String name);
 
-    public void refreshLastAccessTime() {
-        this.lastAccessTime = System.currentTimeMillis();
-    }
+    /**
+     * 移除属性
+     *
+     * @param name 属性名
+     */
+    void removeAttribute(String name);
 
-    public String getSessionId() {
-        return sessionId;
-    }
+    /**
+     * 销毁会话
+     */
+    void invalidate();
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
 
-    public Map<String, Object> getAttributes() {
-        return attributes;
-    }
+    /**
+     * 获取最后访问时间
+     *
+     * @return 最后访问时间，单位毫秒 since 1/ 1/ 1970 GMT
+     */
+    long getLastAccessedTime();
 
-    public void setAttributes(Map<String, Object> attributes) {
-        this.attributes = attributes;
-    }
+    /**
+     * 获取创建时间
+     *
+     * @return 创建时间，单位毫秒 since 1/ 1/ 1970 GMT
+     */
+    long getCreationTime();
 
-    public long getLastAccessTime() {
-        return lastAccessTime;
-    }
+    /**
+     * 获取最大未使用时间
+     *
+     * @return 最大未使用时间，单位秒
+     */
+    int getMaxInactiveInterval();
 
-    public void setLastAccessTime(long lastAccessTime) {
-        this.lastAccessTime = lastAccessTime;
-    }
+    /**
+     * 设置最大未使用时间
+     *
+     * @param interval 最大未使用时间，单位秒
+     */
+    void setMaxInactiveInterval(int interval);
+
 }

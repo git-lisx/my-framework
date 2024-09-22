@@ -1,15 +1,16 @@
 package cn.xian.tomcat;
 
 import cn.xian.log.Log;
-import cn.xian.servlet.http.MyHttpServlet;
-import cn.xian.servlet.http.MyHttpServletRequest;
-import cn.xian.servlet.http.MyHttpServletResponse;
+import cn.xian.servlet.http.*;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static cn.xian.servlet.http.MyHttpServletResponse.SC_NOT_FOUND;
+import static cn.xian.servlet.http.MyHttpServletResponse.SC_REQUEST_TIMEOUT;
 
 public class MyHttpRequestHandler implements Runnable {
 
@@ -42,7 +43,7 @@ public class MyHttpRequestHandler implements Runnable {
                 Matcher matcher = Pattern.compile(key).matcher(uri);
                 if (!matcher.find()) {
                     Log.warn("该URI没有相应的前端控制器: {}", uri);
-                    response.send(404, "该资源未找到");
+                    response.sendError(SC_NOT_FOUND, "该资源未找到");
                 }
                 MyHttpServlet servlet = servletMap.get(key);
                 servlet.service(request, response);
@@ -54,7 +55,7 @@ public class MyHttpRequestHandler implements Runnable {
 
 
     public void timeOutService() {
-        response.setStatusCode(408);
+        response.setStatus(SC_REQUEST_TIMEOUT);
         try {
             response.send();
         } catch (IOException ex) {

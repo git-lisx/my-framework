@@ -1,9 +1,7 @@
 package cn.xian.springframework.web.servlet;
 
 import cn.xian.log.Log;
-import cn.xian.servlet.http.MyHttpServletRequest;
-import cn.xian.servlet.http.MyHttpServletResponse;
-import cn.xian.servlet.http.MyHttpServlet;
+import cn.xian.servlet.http.*;
 import cn.xian.springframework.HandlerMapping;
 import cn.xian.springframework.beans.factory.UriFactory;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
@@ -15,6 +13,8 @@ import cn.xian.springframework.beans.factory.config.UriMethodRelation;
 //import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
+
+import static cn.xian.servlet.http.MyHttpServletResponse.SC_NOT_FOUND;
 
 public class MyDispatcherServlet extends MyHttpServlet {
 
@@ -40,7 +40,7 @@ public class MyDispatcherServlet extends MyHttpServlet {
         Optional<UriMethodRelation> uriMethodRelateOptional = UriFactory.getInstance().getUriMethodRelate(uri);
         if (!uriMethodRelateOptional.isPresent()) {
             Log.warn("No handler found for URI: {}", uri);
-            response.send(404, "该资源未找到");
+            response.sendError(SC_NOT_FOUND, "该资源未找到");
             return;
         }
 
@@ -56,7 +56,7 @@ public class MyDispatcherServlet extends MyHttpServlet {
 //            }
         } else {
             Log.warn("Handler executed but returned no content for URI: {}", uri);
-            response.send(404, "没有内容");
+            response.sendError(SC_NOT_FOUND, "没有内容");
         }
     }
 }

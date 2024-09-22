@@ -4,6 +4,8 @@ import cn.xian.servlet.MyServlet;
 
 import java.io.IOException;
 
+import static cn.xian.servlet.http.MyHttpServletResponse.SC_METHOD_NOT_ALLOWED;
+
 public abstract class MyHttpServlet implements MyServlet {
 
 
@@ -26,7 +28,7 @@ public abstract class MyHttpServlet implements MyServlet {
         } else if (method.equals("POST")) {
             this.doPost(request, response);
         } else {
-            response.send(405, "该请求类型暂不支持");
+            response.sendError(SC_METHOD_NOT_ALLOWED, "该请求类型暂不支持");
         }
     }
 

@@ -1,58 +1,48 @@
 package cn.xian.servlet.http;
 
+import cn.xian.servlet.MyServletResponse;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
-public class MyHttpServletResponse {
-    private final OutputStream outputStream;
-    private int statusCode = 200;
-    private String body = "";
-    private final MyHttpSession session;
+public interface MyHttpServletResponse extends MyServletResponse {
 
-    public MyHttpServletResponse(OutputStream outputStream, MyHttpSession session) {
-        this.outputStream = outputStream;
-        this.session = session;
-    }
+    void setStatus(int status);
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
+    void sendError(int status, String msg) throws IOException;
 
-    public void setBody(String body) {
-        this.body = body;
-    }
+    void sendError(int status) throws IOException;
 
-    public void send() throws IOException {
-        PrintWriter writer = new PrintWriter(outputStream);
-        writer.println("HTTP/1.1 " + statusCode + " " + getReasonPhrase(statusCode));
-        writer.println("Content-Type: text/html; charset=UTF-8");
-//        writer.println("Content-Type: application/json; charset=UTF-8");
-        writer.println("Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length);
-        String sessionId = session.getSessionId();
-        writer.println("Set-Cookie: JSESSIONID=" + sessionId);
+    /**
+     * 为了方便实现，临时接口，标准的servlet没有该接口
+     *
+     * @throws IOException 异常
+     */
+    @Deprecated
+    void send() throws IOException;
 
-        writer.println();
-        writer.println(body);
-        writer.flush();
-    }
+    /**
+     * 为了方便实现，临时接口，标准的servlet没有该接口
+     *
+     * @param body 响应体
+     */
+    @Deprecated
+    void setBody(String body);
 
-    private String getReasonPhrase(int statusCode) {
-        switch (statusCode) {
-            case 200:
-                return "OK";
-            case 404:
-                return "Not Found";
-            default:
-                return "";
-        }
-    }
-
-    public void send(int statusCode, String body) throws IOException {
-        this.statusCode = statusCode;
-        this.body = body;
-        this.send();
-    }
+    /**
+     * 正常的响应状态码
+     */
+    int SC_OK = 200;
+    /**
+     * 资源未找到
+     */
+    int SC_NOT_FOUND = 404;
+    /**
+     * 方法不允许
+     */
+    int SC_METHOD_NOT_ALLOWED = 405;
+    /**
+     * 请求超时
+     */
+    int SC_REQUEST_TIMEOUT = 408;
 
 }
