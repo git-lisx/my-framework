@@ -27,11 +27,11 @@
 
 ### tomcat
 
-使用socket技术实现，遵循http超文本协议规范，引入自己定义的servlet-api，实现了
+使用socket技术实现，遵循http超文本协议规范，引入自己定义的servlet-api，已实现的功能：
 
 - 处理http请求
 - session会话
-- session过期清理（懒惰清理+定期清理策略，提升性能和降低内存压力，待实现）
+- session过期清理（懒惰清理+定期清理策略，提升性能和降低内存压力）
 - 多servlet容器支持
 - 超时设置
 - IO多路复用（后续计划实现）

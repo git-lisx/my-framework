@@ -1,6 +1,7 @@
 package cn.xian.tomcat.http;
 
 import cn.xian.servlet.http.MyHttpSession;
+import cn.xian.tomcat.MyContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class MyStandardSession implements MyHttpSession {
         this.attributes = new HashMap<>();
         this.creationTime = System.currentTimeMillis();
         this.lastAccessTime = creationTime;
+        this.maxInactiveInterval = MyContext.getServerConfig().getSessionTimeout();
     }
 
     public void refreshLastAccessTime() {

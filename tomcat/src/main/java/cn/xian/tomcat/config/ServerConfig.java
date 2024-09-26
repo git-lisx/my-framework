@@ -15,9 +15,10 @@ public class ServerConfig {
      */
     private int sessionTimeout = 0;
 
-
-    public static ServerConfig getInstance(){
-        return new ServerConfig();
+    public ServerConfig(int port, int handleTimeout, int sessionTimeout) {
+        this.port = port;
+        this.handleTimeout = handleTimeout;
+        this.sessionTimeout = sessionTimeout;
     }
 
 

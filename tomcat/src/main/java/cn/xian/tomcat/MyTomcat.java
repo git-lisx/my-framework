@@ -32,6 +32,7 @@ public class MyTomcat {
             this.port = port;
             this.handleTimeout = handleTimeout;
             this.sessionTimeout = sessionTimeout;
+            this.serverConfig = new ServerConfig(port, handleTimeout, sessionTimeout);
         }
 
     }
@@ -41,6 +42,8 @@ public class MyTomcat {
     }
 
     public void start() throws IOException {
+        MyContext.setServerConfig(serverConfig);
+
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             Log.info("服务已启动，端口号: " + port);
             while (true) {
