@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>web-app</artifactId>
+    <artifactId>web-app-tomcat</artifactId>
     <packaging>war</packaging>
 
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.20</version>
+            <version>1.18.36</version>
         </dependency>
         <dependency>
             <groupId>cn.xian</groupId>

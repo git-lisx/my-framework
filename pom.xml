@@ -8,7 +8,7 @@
     <artifactId>my-framework</artifactId>
     <version>1.0</version>
     <modules>
-        <module>web-app</module>
+        <module>web-app-tomcat</module>
         <module>spring-framework</module>
         <module>tomcat</module>
         <module>spring-boot-starter-web</module>

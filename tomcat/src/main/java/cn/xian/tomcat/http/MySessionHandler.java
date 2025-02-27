@@ -4,9 +4,10 @@ import cn.xian.log.Log;
 import cn.xian.servlet.http.MyHttpSession;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MySessionHandler {
-    private static final Map<String, MyStandardSession> sessionMap = new HashMap<>();
+    private static final Map<String, MyStandardSession> sessionMap = new ConcurrentHashMap<>();
 
     static {
         Timer timer = new Timer();

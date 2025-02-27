@@ -10,7 +10,7 @@
     - spring-boot-starter-web # springboot web版
     - spring-framework # 框架层
     - tomcat # tomcat实现
-    - web-app # 业务层war包
+    - web-app-tomcat # 业务层war包
     - web-app-springboot # 业务层jar
 
 ### spring-framework

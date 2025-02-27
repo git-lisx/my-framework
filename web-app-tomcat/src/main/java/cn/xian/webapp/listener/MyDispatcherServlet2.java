@@ -4,7 +4,6 @@ import cn.xian.log.Log;
 import cn.xian.springframework.HandlerMapping;
 import cn.xian.springframework.beans.factory.UriFactory;
 import cn.xian.springframework.beans.factory.config.UriMethodRelation;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -20,7 +19,6 @@ import static cn.xian.springframework.web.constant.WebConstant.TEXT_HTML_UTF_8;
 /**
  * 前端控制器正常情况下放在spring-framework项目下，为了实现简易版本的tomcat（简易版本不引入servlet-api），当前的前端控制器先临时放在此处
  */
-@Slf4j
 public class MyDispatcherServlet2 extends HttpServlet {
 
     @Override
