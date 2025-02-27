@@ -32,6 +32,10 @@ public class MyRequest implements MyHttpServletRequest {
             }
             lines.add(line);  // 保存请求头
         }
+        System.out.println();
+        System.out.println("接收到的信息：");
+        System.out.println("\n" + String.join("\n", lines));
+        System.out.println();
 
         if (lines.isEmpty()) {
             // 为啥会出现这个情况？
